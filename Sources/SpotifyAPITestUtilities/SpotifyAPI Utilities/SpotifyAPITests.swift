@@ -128,5 +128,3 @@ extension AuthorizationCodeFlowPKCEBackendManager: _AuthorizationCodeFlowPKCEMan
 }
 
 extension ClientCredentialsFlowBackendManager: _ClientCredentialsFlowManagerProtocol { }
-
-

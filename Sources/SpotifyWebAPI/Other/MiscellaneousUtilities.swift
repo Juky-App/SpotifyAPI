@@ -23,12 +23,17 @@ public extension Dictionary where Key == String, Value == String {
      utf-8 character encoding.
      */
     func formURLEncoded() -> Data? {
+
+        let formDataString = self.map { key, value in
+            key.addingPercentEncoding(
+                withAllowedCharacters: .formURLAllowed
+            )! + "=" + value.addingPercentEncoding(
+                withAllowedCharacters: .formURLAllowed
+            )!
+        }.joined(separator: "&")
         
-        var urlComponents = URLComponents()
-        urlComponents.queryItems = self.map { item in
-            URLQueryItem(name: item.key, value: item.value)
-        }
-        return (urlComponents.percentEncodedQuery ?? "").data(using: .utf8)
+        return formDataString.data(using: .utf8)
+
     }
     
 }
@@ -225,6 +230,11 @@ public extension CharacterSet {
         .urlPathAllowed
     )
 
+    /// The characters that are allowed in a form-urlencoded string.
+    static let formURLAllowed = CharacterSet(
+        charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~"
+    )
+
 }
 
 /// Generates an array of offests to get each page of results.
@@ -233,48 +243,43 @@ public extension CharacterSet {
 public func generatePageOffsets<Page>(
     _ page: Page,
     maxExtraPages: Int? = nil
-) -> [Int] where 
-    Page: PagingObjectProtocol,
-    Page.Item: Codable & Hashable
+) -> [Int] where
+    Page: PagingObjectProtocol
 {
-
+    // Calculate the minimum offset from where we start generating.
     let minOffset = page.offset + page.limit
 
-    let maxOffset: Int
-
+    // Calculate the absolute maximum offset.
     let absoluteMaxOffset = max(0, page.total - 1)
 
+    // Determine the effective maximum offset based on `maxExtraPages`.
+    let maxOffset: Int
     if let maxExtraPages = maxExtraPages {
         let theoreticalOffset = page.offset + (page.limit * maxExtraPages)
-        // print("theoreticalOffset:", theoreticalOffset)
         maxOffset = max(0, min(theoreticalOffset, absoluteMaxOffset))
-    }
-    else {
+    } else {
         maxOffset = absoluteMaxOffset
     }
 
-    // must be at least 1 to avoid running indefinitely and never returning
+    // If no pages can be generated, return an empty array.
+    if minOffset > maxOffset {
+        return []
+    }
+
+    // Set the step size, ensuring it's at least 1 to prevent infinite loops.
     let step = max(1, page.limit)
     var pageOffsets: [Int] = []
-    var i = minOffset
 
-    print(
-        """
-        min offset: \(minOffset); \
-        max offset: \(minOffset); \
-        step = \(step)
-        """
-    )
-
-    let max =  maxOffset   + 1
-    while i < max {
-        pageOffsets.append(i)
-        i += step
+    // Generate offsets up to the maximum, inclusive.
+    var currentOffset = minOffset
+    while currentOffset <= maxOffset {
+        pageOffsets.append(currentOffset)
+        currentOffset += step
     }
 
     return pageOffsets
-
 }
+
 
 // extension DispatchQueue {
 //

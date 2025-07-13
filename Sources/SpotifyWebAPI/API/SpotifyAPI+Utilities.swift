@@ -202,12 +202,8 @@ public extension SpotifyAPI {
         
         pagePublishers.append(currentPagePublisher)
 
-
         // Avoid Error:
         // Swift runtime failure: Stride size must not be zero
-
-        // the offset of the page after the current one
-        let lowerBoundOffset = page.offset + page.limit
 
         let pageOffsets = generatePageOffsets(
             page,
