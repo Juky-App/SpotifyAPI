@@ -16,19 +16,7 @@ final class CodingSpotifyUserTests: SpotifyAPITestCase {
         let user = SpotifyUser.sampleCurrentUserProfile
         encodeDecode(user, areEqual: ==)
         
-        XCTAssertEqual(user.country, "US")
         XCTAssertEqual(user.displayName, "petervschorn")
-        XCTAssertEqual(user.email, "youalmostgotme@gmail.com")
-        XCTAssertEqual(user.allowsExplicitContent, true)
-        XCTAssertEqual(user.explicitContentSettingIsLocked, false)
-        XCTAssertEqual(
-            user.externalURLs,
-            [
-                "spotify": URL(string: "https://open.spotify.com/user/petervschorn")!
-            ]
-        )
-        XCTAssertEqual(user.followers?.total, 2)
-        XCTAssertNil(user.followers?.href)
         XCTAssertEqual(
             user.href,
             URL(string: "https://api.spotify.com/v1/users/petervschorn")!
@@ -37,7 +25,6 @@ final class CodingSpotifyUserTests: SpotifyAPITestCase {
         XCTAssertEqual(user.uri, "spotify:user:petervschorn")
         XCTAssertEqual(user.type, .user)
         XCTAssertEqual(user.images, [])
-        XCTAssertEqual(user.product, "premium")
 
 
     }
@@ -49,9 +36,6 @@ final class CodingSpotifyUserTests: SpotifyAPITestCase {
             from: Self.aprilUserProfileData
         )
         encodeDecode(user, areEqual: ==)
-        
-        XCTAssertNil(user.allowsExplicitContent)
-        XCTAssertNil(user.explicitContentSettingIsLocked)
         XCTAssertEqual(user.displayName, "April")
         XCTAssertEqual(
             user.externalURLs,
@@ -59,8 +43,6 @@ final class CodingSpotifyUserTests: SpotifyAPITestCase {
                 "spotify": URL(string: "https://open.spotify.com/user/p8gjjfbirm8ucyt82ycfi9zuu")!
             ]
         )
-        XCTAssertEqual(user.followers?.total, 14)
-        XCTAssertNil(user.followers?.href)
         XCTAssertEqual(
             user.href,
             URL(string: "https://api.spotify.com/v1/users/p8gjjfbirm8ucyt82ycfi9zuu")!

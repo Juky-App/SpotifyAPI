@@ -28,12 +28,6 @@ extension SpotifyAPIArtistTests {
             artist.href?.removingQueryItems(),
             URL(string: "https://api.spotify.com/v1/artists/0k17h0D3J5VfsdmQ1iZtE9")
         )
-        if let popularity = artist.popularity {
-            XCTAssert((0...100).contains(popularity), "\(popularity)")
-        }
-        else {
-            XCTFail("popularity should not be nil")
-        }
         
         if let genres = artist.genres {
             XCTAssert(genres.contains("art rock"))
@@ -57,13 +51,6 @@ extension SpotifyAPIArtistTests {
         }
         else {
             XCTFail("externalURLs should not be nil")
-        }
-        
-        if let followers = artist.followers {
-            XCTAssert(followers.total > 1_000_000, "\(followers.total)")
-        }
-        else {
-            XCTFail("followers should not be nil")
         }
         
         XCTAssertImagesExist(artist.images, assertSizeNotNil: true)
@@ -122,68 +109,6 @@ extension SpotifyAPIArtistTests {
         self.wait(for: [expectation], timeout: 60)
 
     }
-
-    func artists() {
-        
-        func receiveArtists(_ artists: [Artist?]) {
-
-            for artist in artists {
-                if let artist = artist {
-                    XCTAssertEqual(artist.type, .artist)
-                }
-                encodeDecode(artist, areEqual: ==)
-            }
-            
-            guard artists.count >= 4 else {
-                XCTFail(
-                    "should've received at least 4 artists (got \(artists.count)"
-                )
-                return
-            }
-
-            XCTAssertEqual(artists[0]?.name, "levitation room")
-            XCTAssertEqual(artists[0]?.uri, "spotify:artist:0SVxQVCnJn1BNUMY9ZcRO4")
-            XCTAssertEqual(artists[0]?.id, "0SVxQVCnJn1BNUMY9ZcRO4")
-            
-            XCTAssertEqual(artists[1]?.name, "The Beatles")
-            XCTAssertEqual(artists[1]?.uri, "spotify:artist:3WrFJ7ztbogyGnTHbHJFl2")
-            XCTAssertEqual(artists[1]?.id, "3WrFJ7ztbogyGnTHbHJFl2")
-
-            XCTAssertEqual(artists[2]?.name, "Radiohead")
-            XCTAssertEqual(artists[2]?.uri, "spotify:artist:4Z8W4fKeB5YxbusRsdQVPb")
-            XCTAssertEqual(artists[2]?.id, "4Z8W4fKeB5YxbusRsdQVPb")
-
-            if let pinkFloyd = artists[3] {
-                receivePinkFloyd(pinkFloyd)
-            }
-            else {
-                XCTFail("artists[3] (Pink Floyd) should not be nil")
-            }
-            
-        }
-        
-        let artists: [SpotifyURIConvertible] = [
-            URIs.Artists.levitationRoom,
-//            "spotify:artist:invaliduri",
-            URIs.Artists.theBeatles,
-            URIs.Artists.radiohead,
-            URIs.Artists.pinkFloyd
-        ]
-        
-        let expectation = XCTestExpectation(description: "testArtists")
-        
-        Self.spotify.artists(artists)
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveArtists(_:)
-            )
-            .store(in: &Self.cancellables)
-        
-        self.wait(for: [expectation], timeout: 60)
-
-    }
     
     func artistAlbums() {
         
@@ -212,7 +137,6 @@ extension SpotifyAPIArtistTests {
                 XCTAssertNotEqual(album.name, "Relics")
                 
                 XCTAssertEqual(album.type, .album)
-                XCTAssertEqual(album.albumGroup, .album)
                 XCTAssertEqual(album.albumType, .album)
                 XCTAssertEqual(album.artists?.first?.name, "Pink Floyd")
                 XCTAssertEqual(
@@ -363,7 +287,6 @@ extension SpotifyAPIArtistTests {
             encodeDecode(albums)
             for album in albums.items {
                 encodeDecode(album)
-                XCTAssertEqual(album.albumGroup, .single)
                 XCTAssertEqual(album.artists?.first?.name, "Radiohead")
                 XCTAssertEqual(
                     album.artists?.first?.uri,
@@ -486,51 +409,6 @@ extension SpotifyAPIArtistTests {
         
     }
     
-    func artistTopTracks() {
-        
-        let expectation = XCTestExpectation(
-            description: "testArtistTopTracks"
-        )
-        
-        Self.spotify.authorizationManager.setExpirationDate(to: Date())
-        var authChangeCount = 0
-        var cancellables: Set<AnyCancellable> = []
-        Self.spotify.authorizationManagerDidChange.sink(receiveValue: {
-            authChangeCount += 1
-        })
-        .store(in: &cancellables)
-
-        Self.spotify.artistTopTracks(
-            URIs.Artists.theBeatles, country: "US"
-        )
-        .XCTAssertNoFailure()
-        .sink(
-            receiveCompletion: { _ in expectation.fulfill() },
-            receiveValue: { tracks in
-                encodeDecode(tracks)
-                for track in tracks {
-                    encodeDecode(track)
-                    guard let artist = track.artists?.first else {
-                        XCTFail("no artists for track '\(track.name)'")
-                        continue
-                    }
-                    XCTAssertEqual(artist.name, "The Beatles")
-                    XCTAssertEqual(artist.uri, "spotify:artist:3WrFJ7ztbogyGnTHbHJFl2")
-                    XCTAssertEqual(artist.id, "3WrFJ7ztbogyGnTHbHJFl2")
-                    
-                }
-            }
-        )
-        .store(in: &Self.cancellables)
-        
-        self.wait(for: [expectation], timeout: 60)
-        XCTAssertEqual(
-            authChangeCount, 1,
-            "authorizationManagerDidChange should emit exactly once"
-        )
-        
-    }
-    
 }
 
 // MARK: Authorization and setup methods
@@ -595,7 +473,6 @@ final class SpotifyAPIClientCredentialsFlowArtistTests:
 
     static let allTests = [
         ("testArtist", testArtist),
-        ("testArtists", testArtists),
         ("testArtistAlbums", testArtistAlbums),
         (
             "testArtistAlbumsExtendSinglePageSerial",
@@ -606,12 +483,10 @@ final class SpotifyAPIClientCredentialsFlowArtistTests:
             testArtistAlbumsExtendSinglePageConcurrent
         ),
         ("testArtistAlbumsSingles", testArtistAlbumsSingles),
-        ("testArtistTopTracks", testArtistTopTracks)
 
     ]
     
     func testArtist() { artist() }
-    func testArtists() { artists() }
     func testArtistAlbums() { artistAlbums() }
     func testArtistAlbumsExtendSinglePageSerial() {
         artistAlbumsExtendSinglePageSerial()
@@ -620,7 +495,6 @@ final class SpotifyAPIClientCredentialsFlowArtistTests:
         artistAlbumsExtendSinglePageConcurrent()
     }
     func testArtistAlbumsSingles() { artistAlbumsSingles() }
-    func testArtistTopTracks() { artistTopTracks() }
 }
 
 final class SpotifyAPIAuthorizationCodeFlowArtistTests:
@@ -629,8 +503,6 @@ final class SpotifyAPIAuthorizationCodeFlowArtistTests:
 
     static let allTests = [
         ("testArtist", testArtist),
-        ("testArtists", testArtists),
-        ("testArtistAlbums", testArtistAlbums),
         (
             "testArtistAlbumsExtendSinglePageSerial",
             testArtistAlbumsExtendSinglePageSerial
@@ -640,7 +512,6 @@ final class SpotifyAPIAuthorizationCodeFlowArtistTests:
             testArtistAlbumsExtendSinglePageConcurrent
         ),
         ("testArtistAlbumsSingles", testArtistAlbumsSingles),
-        ("testArtistTopTracks", testArtistTopTracks)
 
     ]
     
@@ -662,8 +533,6 @@ final class SpotifyAPIAuthorizationCodeFlowArtistTests:
     }
     
     func testArtist() { artist() }
-    func testArtists() { artists() }
-    func testArtistAlbums() { artistAlbums() }
     func testArtistAlbumsExtendSinglePageSerial() {
         artistAlbumsExtendSinglePageSerial()
     }
@@ -671,7 +540,6 @@ final class SpotifyAPIAuthorizationCodeFlowArtistTests:
         artistAlbumsExtendSinglePageConcurrent()
     }
     func testArtistAlbumsSingles() { artistAlbumsSingles() }
-    func testArtistTopTracks() { artistTopTracks() }
 
 }
 
@@ -681,7 +549,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEArtistTests:
 
     static let allTests = [
         ("testArtist", testArtist),
-        ("testArtists", testArtists),
         ("testArtistAlbums", testArtistAlbums),
         (
             "testArtistAlbumsExtendSinglePageSerial",
@@ -692,8 +559,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEArtistTests:
             testArtistAlbumsExtendSinglePageConcurrent
         ),
         ("testArtistAlbumsSingles", testArtistAlbumsSingles),
-        ("testArtistTopTracks", testArtistTopTracks)
-
     ]
     
     /// Authorize for zero scopes because none are required for the artist
@@ -713,7 +578,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEArtistTests:
     }
     
     func testArtist() { artist() }
-    func testArtists() { artists() }
     func testArtistAlbums() { artistAlbums() }
     func testArtistAlbumsExtendSinglePageSerial() {
         artistAlbumsExtendSinglePageSerial()
@@ -722,7 +586,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEArtistTests:
         artistAlbumsExtendSinglePageConcurrent()
     }
     func testArtistAlbumsSingles() { artistAlbumsSingles() }
-    func testArtistTopTracks() { artistTopTracks() }
 
 }
 
@@ -734,8 +597,6 @@ final class SpotifyAPIClientCredentialsFlowProxyArtistTests:
 
     static let allTests = [
         ("testArtist", testArtist),
-        ("testArtists", testArtists),
-        ("testArtistAlbums", testArtistAlbums),
         (
             "testArtistAlbumsExtendSinglePageSerial",
             testArtistAlbumsExtendSinglePageSerial
@@ -745,12 +606,10 @@ final class SpotifyAPIClientCredentialsFlowProxyArtistTests:
             testArtistAlbumsExtendSinglePageConcurrent
         ),
         ("testArtistAlbumsSingles", testArtistAlbumsSingles),
-        ("testArtistTopTracks", testArtistTopTracks)
 
     ]
     
     func testArtist() { artist() }
-    func testArtists() { artists() }
     func testArtistAlbums() { artistAlbums() }
     func testArtistAlbumsExtendSinglePageSerial() {
         artistAlbumsExtendSinglePageSerial()
@@ -759,7 +618,6 @@ final class SpotifyAPIClientCredentialsFlowProxyArtistTests:
         artistAlbumsExtendSinglePageConcurrent()
     }
     func testArtistAlbumsSingles() { artistAlbumsSingles() }
-    func testArtistTopTracks() { artistTopTracks() }
 
 }
 
@@ -769,8 +627,6 @@ final class SpotifyAPIAuthorizationCodeFlowProxyArtistTests:
 
     static let allTests = [
         ("testArtist", testArtist),
-        ("testArtists", testArtists),
-        ("testArtistAlbums", testArtistAlbums),
         (
             "testArtistAlbumsExtendSinglePageSerial",
             testArtistAlbumsExtendSinglePageSerial
@@ -780,7 +636,6 @@ final class SpotifyAPIAuthorizationCodeFlowProxyArtistTests:
             testArtistAlbumsExtendSinglePageConcurrent
         ),
         ("testArtistAlbumsSingles", testArtistAlbumsSingles),
-        ("testArtistTopTracks", testArtistTopTracks)
 
     ]
     
@@ -802,8 +657,6 @@ final class SpotifyAPIAuthorizationCodeFlowProxyArtistTests:
     }
     
     func testArtist() { artist() }
-    func testArtists() { artists() }
-    func testArtistAlbums() { artistAlbums() }
     func testArtistAlbumsExtendSinglePageSerial() {
         artistAlbumsExtendSinglePageSerial()
     }
@@ -811,7 +664,6 @@ final class SpotifyAPIAuthorizationCodeFlowProxyArtistTests:
         artistAlbumsExtendSinglePageConcurrent()
     }
     func testArtistAlbumsSingles() { artistAlbumsSingles() }
-    func testArtistTopTracks() { artistTopTracks() }
 
 }
 
@@ -821,7 +673,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEProxyArtistTests:
 
     static let allTests = [
         ("testArtist", testArtist),
-        ("testArtists", testArtists),
         ("testArtistAlbums", testArtistAlbums),
         (
             "testArtistAlbumsExtendSinglePageSerial",
@@ -832,7 +683,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEProxyArtistTests:
             testArtistAlbumsExtendSinglePageConcurrent
         ),
         ("testArtistAlbumsSingles", testArtistAlbumsSingles),
-        ("testArtistTopTracks", testArtistTopTracks)
 
     ]
     
@@ -853,7 +703,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEProxyArtistTests:
     }
     
     func testArtist() { artist() }
-    func testArtists() { artists() }
     func testArtistAlbums() { artistAlbums() }
     func testArtistAlbumsExtendSinglePageSerial() {
         artistAlbumsExtendSinglePageSerial()
@@ -862,6 +711,5 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEProxyArtistTests:
         artistAlbumsExtendSinglePageConcurrent()
     }
     func testArtistAlbumsSingles() { artistAlbumsSingles() }
-    func testArtistTopTracks() { artistTopTracks() }
 
 }

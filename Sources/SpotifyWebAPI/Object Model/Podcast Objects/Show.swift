@@ -43,12 +43,6 @@ public struct Show: Hashable {
 
     /// The cover art for the episode in various sizes, widest first.
     public let images: [SpotifyImage]?
-    
-    /// A list of the countries in which the show can be played, identified by
-    /// their [ISO 3166-1 alpha-2][1] codes.
-    ///
-    /// [1]: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-    public let availableMarkets: [String]?
 
     /**
      A link to the Spotify web API endpoint providing the full show object.
@@ -85,9 +79,6 @@ public struct Show: Hashable {
     /// The media type of the show.
     public let mediaType: String?
 
-    /// The publisher of the show.
-    public let publisher: String?
-
     /// The object type. Always ``IDCategory/show``.
     public let type: IDCategory
     
@@ -106,8 +97,6 @@ public struct Show: Hashable {
        - uri: The [Spotify URI][1] for the episode.
        - id: The [Spotify ID][1] for the episode.
        - images: The cover art for the episode.
-       - availableMarkets: A list of the countries in which the show can be
-             played, identified by their [ISO 3166-1 alpha-2][2] code.
        - href: A link to the Spotify web API endpoint providing the full show
              object.
        - externalURLs: Known external urls for this show.
@@ -121,7 +110,6 @@ public struct Show: Hashable {
        - copyrights: The copyrights for the show. Only available for the full
              version.
        - mediaType: The media type of the show.
-       - publisher: The publisher of the show.
      
      [1]: https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids
      [2]: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
@@ -137,14 +125,12 @@ public struct Show: Hashable {
         uri: String? = nil,
         id: String? = nil,
         images: [SpotifyImage]? = nil,
-        availableMarkets: [String]? = nil,
         href: URL? = nil,
         externalURLs: [String: URL]? = nil,
         isExternallyHosted: Bool? = nil,
         languages: [String]? = nil,
         copyrights: [SpotifyCopyright]? = nil,
         mediaType: String? = nil,
-        publisher: String? = nil
     ) {
         self.name = name
         self.description = description
@@ -155,14 +141,12 @@ public struct Show: Hashable {
         self.uri = uri
         self.id = id
         self.images = images
-        self.availableMarkets = availableMarkets
         self.href = href
         self.externalURLs = externalURLs
         self.isExternallyHosted = isExternallyHosted
         self.languages = languages
         self.copyrights = copyrights
         self.mediaType = mediaType
-        self.publisher = publisher
         self.type = .show
     }
 
@@ -180,14 +164,12 @@ extension Show: Codable {
         case uri
         case id
         case images
-        case availableMarkets = "available_markets"
         case href
         case externalURLs = "external_urls"
         case isExternallyHosted = "is_externally_hosted"
         case languages
         case copyrights
         case mediaType = "media_type"
-        case publisher
         case type
     }
     
@@ -224,11 +206,6 @@ extension Show: Codable {
         
         self.images = try container.decodeSpotifyImages(forKey: .images)
 
-        // MARK: Decode Available Markets
-        self.availableMarkets = try container.decodeAndUnwrapArray(
-            forKey: .availableMarkets
-        )
-
         self.href = try container.decodeIfPresent(
             URL.self, forKey: .href
         )
@@ -244,9 +221,6 @@ extension Show: Codable {
         )
         self.mediaType = try container.decodeIfPresent(
             String.self, forKey: .mediaType
-        )
-        self.publisher = try container.decodeIfPresent(
-            String.self, forKey: .publisher
         )
         
         self.type = (try? container.decodeIfPresent(
@@ -287,9 +261,6 @@ extension Show: Codable {
             self.images, forKey: .images
         )
         try container.encodeIfPresent(
-            self.availableMarkets, forKey: .availableMarkets
-        )
-        try container.encodeIfPresent(
             self.href, forKey: .href
         )
         try container.encodeIfPresent(
@@ -306,9 +277,6 @@ extension Show: Codable {
         )
         try container.encodeIfPresent(
             self.mediaType, forKey: .mediaType
-        )
-        try container.encodeIfPresent(
-            self.publisher, forKey: .publisher
         )
         try container.encodeIfPresent(
             self.type, forKey: .type
@@ -341,14 +309,12 @@ extension Show: ApproximatelyEquatable {
                 self.uri == other.uri &&
                 self.id == other.id &&
                 self.images == other.images &&
-                self.availableMarkets == other.availableMarkets &&
                 self.href == other.href &&
                 self.externalURLs == other.externalURLs &&
                 self.isExternallyHosted == other.isExternallyHosted &&
                 self.languages == other.languages &&
                 self.copyrights == other.copyrights &&
                 self.mediaType == other.mediaType &&
-                self.publisher == other.publisher &&
                 self.type == other.type &&
                 self.episodes.isApproximatelyEqual(to: other.episodes)
 

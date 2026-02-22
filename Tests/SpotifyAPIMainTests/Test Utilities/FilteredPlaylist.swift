@@ -62,7 +62,7 @@ extension FilteredPlaylist: Codable {
             keyedBy: CodingKeys.TrackPagingObjectKeys.self, forKey: .tracks
         )
         let tracksDict = self.tracks.map { track in
-            ["tracks": track]
+            ["items": track]
             
         }
         try trackPagingObjectContainer.encode(

@@ -47,67 +47,6 @@ public extension SpotifyAPI {
         } catch {
             return error.anyFailingPublisher()
         }
-        
-    }
-    
-    /**
-     Get multiple artists.
-     
-     No scopes are required for this endpoint.
-
-     See also: ``artist(_:)`` - gets a single artist
-
-     Read more at the [Spotify web API reference][1].
-     
-     - Parameter uris: An array of up to 20 URIs for artists. Passing in an
-           empty array will immediately cause an empty array of results to be
-           returned without a network request being made.
-     - Returns: An array of the full versions of artists. Artists are
-           returned in the order requested. If an artist is not found, `nil` is
-           returned in the corresponding position. Duplicate artists in the
-           request will result in duplicate artists in the response.
-     
-     [1]: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-multiple-artists
-     */
-    func artists(
-        _ uris: [SpotifyURIConvertible]
-    ) -> AnyPublisher<[Artist?], Error> {
-        
-        do {
-
-            if uris.isEmpty {
-                return ResultPublisher([])
-                    .eraseToAnyPublisher()
-            }
-            
-            let idsString = try SpotifyIdentifier
-                .commaSeparatedIdsString(
-                    uris, ensureCategoryMatches: [.artist]
-                )
-            
-            return self.getRequest(
-                path: "/artists",
-                queryItems: ["ids": idsString],
-                requiredScopes: []
-            )
-            .decodeSpotifyObject(
-                [String: [Artist?]].self,
-                maxRetryDelay: self.maxRetryDelay
-            )
-            .tryMap { dict -> [Artist?] in
-                if let artists = dict["artists"] {
-                    return artists
-                }
-                throw SpotifyGeneralError.topLevelKeyNotFound(
-                    key: "artists", dict: dict
-                )
-            }
-            .eraseToAnyPublisher()
-            
-        } catch {
-            return error.anyFailingPublisher()
-        }
-        
     }
     
     /**
@@ -177,59 +116,7 @@ public extension SpotifyAPI {
         }
         
     }
-    
-    /**
-     Get the top tracks for an artist.
 
-     No scopes are required for this endpoint.
-     
-     Read more at the [Spotify web API reference][1].
-     
-     - Parameters:
-       - artist: The URI of an artist.
-       - country: An [ISO 3166-1 alpha-2 country code][2] or the string
-             "from_token".
-     - Returns: The full versions of up to ten tracks.
-     
-     [1]: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-an-artists-top-tracks
-     [2]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-     */
-    func artistTopTracks(
-        _ artist: SpotifyURIConvertible,
-        country: String
-    ) -> AnyPublisher<[Track], Error> {
-        
-        do {
-            
-            let artistId = try SpotifyIdentifier(
-                uri: artist, ensureCategoryMatches: [.artist]
-            ).id
-            
-            return self.getRequest(
-                path: "/artists/\(artistId)/top-tracks",
-                queryItems: ["country": country],
-                requiredScopes: []
-            )
-            .decodeSpotifyObject(
-                [String: [Track]].self,
-                maxRetryDelay: self.maxRetryDelay
-            )
-            .tryMap { dict -> [Track] in
-                if let tracks = dict["tracks"] {
-                    return tracks
-                }
-                throw SpotifyGeneralError.topLevelKeyNotFound(
-                    key: "tracks", dict: dict
-                )
-            }
-            .eraseToAnyPublisher()
-            
-        } catch {
-            return error.anyFailingPublisher()
-        }
-        
-    }
-    
     /**
      [**DEPRECATED**] Get the related artists for an artist.
 

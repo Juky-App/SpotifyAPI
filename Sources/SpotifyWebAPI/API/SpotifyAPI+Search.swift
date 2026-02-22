@@ -91,8 +91,8 @@ public extension SpotifyAPI {
              **episodes. Therefore, if you authorized your application using**
              **the client credentials flow, you must provide a value for this**
              **parameter in order to retrieve shows and episodes.**
-       - limit: Maximum number of results to return. Default: 20; Minimum: 1;
-             Maximum: 50. **Note:** The limit is applied within each type, not
+       - limit: Maximum number of results to return. Default: 5; Minimum: 1;
+             Maximum: 10. **Note:** The limit is applied within each type, not
              on the total response. For example, if the limit value is 3 and the
              types are ``IDCategory/artist`` and ``IDCategory/album``, the
              response contains up to 3 artists and 3 albums.

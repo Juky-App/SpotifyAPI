@@ -111,7 +111,6 @@ extension SpotifyAPIEpisodeTests {
         XCTAssert(show.isExternallyHosted == false)
         XCTAssertEqual(show.mediaType, "audio")
         XCTAssertEqual(show.name, "Making Sense with Sam Harris")
-        XCTAssertEqual(show.publisher, "Sam Harris")
         if let totalEpisodes = show.totalEpisodes {
             XCTAssert(totalEpisodes >= 226, "\(totalEpisodes)")
         }
@@ -147,132 +146,6 @@ extension SpotifyAPIEpisodeTests {
         self.wait(for: [expectation], timeout: 120)
 
     }
-
-    func episodes() {
-        
-        func receiveEpisodes(_ episodes: [Episode?]) {
-            encodeDecode(episodes)
-            guard episodes.count == 3 else {
-                XCTFail("should've received 3 episodes")
-                return
-            }
-            
-            if let samHarris212 = episodes[0] {
-                receiveSamHarris212(samHarris212)
-            }
-            else {
-                XCTFail("first episode should not be nil")
-            }
-            if let samHarris213 =  episodes[1] {
-                XCTAssertEqual(
-                    samHarris213.description,
-                    """
-                    Sam Harris speaks with Gabriel Dance about the global \
-                    epidemic of child sexual abuse. They discuss how \
-                    misleading the concept of “child pornography” is, the \
-                    failure of governments and tech companies to grapple with \
-                    the problem, the tradeoff between online privacy and \
-                    protecting children, the National Center for Missing and \
-                    Exploited Children, photo DNA, the roles played by \
-                    specific tech companies, the ethics of encryption, \
-                    “sextortion,” the culture of pedophiles, and other \
-                    topics. If the Making Sense podcast logo in your player is \
-                    BLACK, you can SUBSCRIBE to gain access to all full-length \
-                    episodes at samharris.org/subscribe.
-                    """
-                )
-                XCTAssertEqual(samHarris213.name, "#213 — The Worst Epidemic")
-                XCTAssertEqual(
-                    samHarris213.uri,
-                    "spotify:episode:7jrEoNMrNicZSxIuKhATHN"
-                )
-                XCTAssertEqual(samHarris213.id, "7jrEoNMrNicZSxIuKhATHN")
-                XCTAssertEqual(samHarris213.durationMS, 8060368)
-                XCTAssertFalse(samHarris213.isExplicit)
-                XCTAssertEqual(samHarris213.type, .episode)
-                XCTAssertEqual(samHarris213.releaseDate, "2020-08-04")
-                XCTAssertEqual(samHarris213.releaseDatePrecision, "day")
-            }
-            else {
-                XCTFail("second episode should not be nil")
-            }
-            
-            if let joeRogan1531 = episodes[2] {
-                XCTAssertEqual(
-                    joeRogan1531.description,
-                    """
-                    Miley Cyrus is a singer-songwriter, actress, and record \
-                    producer. http://mileyl.ink/midnightsky Learn more about \
-                    your ad choices. Visit podcastchoices.com/adchoices
-                    """
-                )
-                XCTAssertEqual(joeRogan1531.name, "#1531 - Miley Cyrus")
-                XCTAssertEqual(
-                    joeRogan1531.uri,
-                    "spotify:episode:0ZEDvQuPtAEBnXE37slSoX"
-                )
-                XCTAssertEqual(joeRogan1531.id, "0ZEDvQuPtAEBnXE37slSoX")
-                XCTAssertEqual(joeRogan1531.durationMS, 7591593)
-                XCTAssertTrue(joeRogan1531.isExplicit)
-                XCTAssertEqual(joeRogan1531.type, .episode)
-                XCTAssertEqual(joeRogan1531.releaseDate, "2020-09-02")
-                XCTAssertEqual(joeRogan1531.releaseDatePrecision, "day")
-            }
-            else {
-                XCTFail("third episode should not be nil")
-            }
-            
-        }
-
-        let authorizationManagerDidChangeExpectation = XCTestExpectation(
-            description: "authorizationManagerDidChange"
-        )
-        let internalQueue = DispatchQueue(label: "internal")
-
-        var didChangeCount = 0
-        var cancellables: Set<AnyCancellable> = []
-        Self.spotify.authorizationManagerDidChange
-            .receive(on: internalQueue)
-            .sink(receiveValue: {
-                didChangeCount += 1
-                internalQueue.asyncAfter(deadline: .now() + 2) {
-                    authorizationManagerDidChangeExpectation.fulfill()
-                }
-            })
-            .store(in: &cancellables)
-
-        Self.spotify.authorizationManager.setExpirationDate(to: Date())
-
-        let expectation = XCTestExpectation(description: "testEpisode")
-        
-        let episodes = URIs.Episodes.array(
-            .samHarris212, .samHarris213, .joeRogan1531
-        )
-        
-        Self.spotify.episodes(episodes, market: "US")
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveEpisodes(_:)
-            )
-            .store(in: &Self.cancellables)
-        
-        self.wait(
-            for: [
-                expectation,
-                authorizationManagerDidChangeExpectation
-            ],
-            timeout: 120
-        )
-        internalQueue.sync {
-            XCTAssertEqual(
-                didChangeCount, 1,
-                "authorizationManagerDidChange should emit exactly once"
-            )
-        }
-
-    }
     
 }
 
@@ -282,11 +155,9 @@ final class SpotifyAPIClientCredentialsFlowEpisodeTests:
 
     static let allTests = [
         ("testEpisode", testEpisode),
-        ("testEpisodes", testEpisodes)
     ]
     
     func testEpisode() { episode() }
-    func testEpisodes() { episodes() }
 
 }
 
@@ -296,11 +167,9 @@ final class SpotifyAPIAuthorizationCodeFlowEpisodeTests:
 
     static let allTests = [
         ("testEpisode", testEpisode),
-        ("testEpisodes", testEpisodes)
     ]
     
     func testEpisode() { episode() }
-    func testEpisodes() { episodes() }
     
 }
 
@@ -310,11 +179,9 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEEpisodeTests:
 
     static let allTests = [
         ("testEpisode", testEpisode),
-        ("testEpisodes", testEpisodes)
     ]
     
     func testEpisode() { episode() }
-    func testEpisodes() { episodes() }
     
     
 }

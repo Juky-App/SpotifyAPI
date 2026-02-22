@@ -44,22 +44,6 @@ public struct Album: Hashable {
     public let images: [SpotifyImage]?
     
     /**
-     The popularity of the album.
-
-     The value will be between 0 and 100, with 100 being the most popular. The
-     popularity is calculated from the popularity of the album’s individual
-     tracks.
-
-     Only available for the full album object.
-     */
-    public let popularity: Int?
-    
-    /// The label for the album.
-    ///
-    /// Do not confuse this with the ``name`` of the album.
-    public let label: String?
-    
-    /**
      A list of the genres the artist is associated with.
     
      For example: "Prog Rock" , "Post-Grunge". (If not yet classified, the array
@@ -90,49 +74,10 @@ public struct Album: Hashable {
      [1]: https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids
      */
     public let externalURLs: [String: URL]?
-    
-    /**
-     Known external IDs for the album.
 
-     - key: The identifier type, for example:
-       - "isrc": [International Standard Recording Code][1]
-       - "ean": [International Article Number][2]
-       - "upc": [Universal Product Code][3]
-     - value: An external identifier for the object.
-     
-     Only available for the full album object.
-     
-     [1]: http://en.wikipedia.org/wiki/International_Standard_Recording_Code
-     [2]: http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29
-     [3]: http://en.wikipedia.org/wiki/Universal_Product_Code
-     */
-    public let externalIds: [String: String]?
-    
     /// The type of the album: one of ``AlbumType/album``, ``AlbumType/single``,
     /// or ``AlbumType/compilation``. See also ``albumGroup``.
     public let albumType: AlbumType?
-
-    /**
-     This property is present when getting an artist’s albums.
-     
-     Possible values are ``AlbumType/album``, ``AlbumType/single``,
-     ``AlbumType/compilation``, and ``AlbumType/appearsOn``. Compared to
-     ``albumType`` this field represents the relationship between the artist and
-     the album.
-     
-     See also ``albumType``.
-     */
-    public let albumGroup: AlbumType?
-    /**
-     A list of the countries in which the album is available, identified by
-     their [ISO 3166-1 alpha-2][1] codes.
-
-     Note that an album is considered available in a market when at least 1 of
-     its tracks is available in that market.
-
-     [1]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-     */
-    public let availableMarkets: [String]?
 
     /// The copyrights for the album.
     public let copyrights: [SpotifyCopyright]?
@@ -175,10 +120,6 @@ public struct Album: Hashable {
        - uri: The [Spotify URI][1] for the album.
        - id: The [Spotify ID][1] for the album.
        - images: The cover art for the album.
-       - popularity: The popularity of the album. Should be between 0 and 100,
-             inclusive.
-       - label: The label for the album. Do not confuse this with the ``name``
-             of the album.
        - genres: A list of the genres the artist is associated with.
        - totalTracks: The total number of tracks in the album.
        - href: A link to the Spotify web API endpoint providing the full album
@@ -187,23 +128,8 @@ public struct Album: Hashable {
              - key: The type of the URL, for example: "spotify" - The [Spotify
                    URL][1] for the object.
              - value: An external, public URL to the object.
-       - externalIds: Known external IDs for the album.
-             - key: The identifier type, for example:
-               - "isrc": [International Standard Recording Code][2]
-               - "ean": [International Article Number][3]
-               - "upc": [Universal Product Code][4]
-             - value: An external identifier for the object.
        - albumType: The type of the album: one of ``AlbumType/album``,
              ``AlbumType/single``, or ``AlbumType/compilation``.
-       - albumGroup: This field is present when getting an artist’s albums.
-             Possible values are ``AlbumType/album``, ``AlbumType/single``,
-             ``AlbumType/compilation``, and ``AlbumType/appearsOn``. Compared to
-             ``albumType`` this field represents the relationship between the
-             artist and the album.
-       - availableMarkets: A list of the countries in which the album is
-             available, identified by their [ISO 3166-1 alpha-2][5] codes. Note
-             that an album is considered available in a market when at least 1
-             of its tracks is available in that market.
        - copyrights: The copyrights for the album.
        - releaseDatePrecision: The precision with which ``releaseDate`` is known:
              "year", "month", or "day".
@@ -232,16 +158,11 @@ public struct Album: Hashable {
         uri: String? = nil,
         id: String? = nil,
         images: [SpotifyImage]? = nil,
-        popularity: Int? = nil,
-        label: String? = nil,
         genres: [String]? = nil,
         totalTracks: Int? = nil,
         href: URL? = nil,
         externalURLs: [String: URL]? = nil,
-        externalIds: [String: String]? = nil,
         albumType: AlbumType? = nil,
-        albumGroup: AlbumType? = nil,
-        availableMarkets: [String]? = nil,
         copyrights: [SpotifyCopyright]? = nil,
         releaseDatePrecision: String? = nil,
         restrictions: [String: String]? = nil
@@ -253,16 +174,11 @@ public struct Album: Hashable {
         self.uri = uri
         self.id = id
         self.images = images
-        self.popularity = popularity
-        self.label = label
         self.genres = genres
         self.totalTracks = totalTracks
         self.href = href
         self.externalURLs = externalURLs
-        self.externalIds = externalIds
         self.albumType = albumType
-        self.albumGroup = albumGroup
-        self.availableMarkets = availableMarkets
         self.copyrights = copyrights
         self.releaseDatePrecision = releaseDatePrecision
         self.restrictions = restrictions
@@ -304,13 +220,7 @@ extension Album: Codable {
         )
 
         self.images = try container.decodeSpotifyImages(forKey: .images)
-        
-        self.popularity = try container.decodeIfPresent(
-            Int.self, forKey: .popularity
-        )
-        self.label = try container.decodeIfPresent(
-            String.self, forKey: .label
-        )
+
         self.genres = try container.decodeIfPresent(
             [String].self, forKey: .genres
         )
@@ -323,18 +233,8 @@ extension Album: Codable {
         self.externalURLs = try container.decodeIfPresent(
             [String: URL].self, forKey: .externalURLs
         )
-        self.externalIds = try container.decodeIfPresent(
-            [String: String].self, forKey: .externalIds
-        )
         self.albumType = try container.decodeIfPresent(
             AlbumType.self, forKey: .albumType
-        )
-        self.albumGroup = try container.decodeIfPresent(
-            AlbumType.self, forKey: .albumGroup
-        )
-
-        self.availableMarkets = try container.decodeAndUnwrapArray(
-            forKey: .availableMarkets
         )
         
         self.copyrights = try container.decodeIfPresent(
@@ -383,12 +283,6 @@ extension Album: Codable {
             self.images, forKey: .images
         )
         try container.encodeIfPresent(
-            self.popularity, forKey: .popularity
-        )
-        try container.encodeIfPresent(
-            self.label, forKey: .label
-        )
-        try container.encodeIfPresent(
             self.genres, forKey: .genres
         )
         try container.encodeIfPresent(
@@ -399,18 +293,6 @@ extension Album: Codable {
         )
         try container.encodeIfPresent(
             self.externalURLs, forKey: .externalURLs
-        )
-        try container.encodeIfPresent(
-            self.externalIds, forKey: .externalIds
-        )
-        try container.encodeIfPresent(
-            self.albumType, forKey: .albumType
-        )
-        try container.encodeIfPresent(
-            self.albumGroup, forKey: .albumGroup
-        )
-        try container.encodeIfPresent(
-            self.availableMarkets, forKey: .availableMarkets
         )
         try container.encodeIfPresent(
             self.copyrights, forKey: .copyrights
@@ -432,16 +314,11 @@ extension Album: Codable {
         case uri
         case id
         case images
-        case popularity
-        case label
         case genres
         case totalTracks = "total_tracks"
         case href
         case externalURLs = "external_urls"
-        case externalIds = "external_ids"
         case albumType = "album_type"
-        case albumGroup = "album_group"
-        case availableMarkets = "available_markets"
         case copyrights
         case releaseDatePrecision = "release_date_precision"
         case restrictions
@@ -472,16 +349,10 @@ extension Album: ApproximatelyEquatable {
                 self.uri == other.uri &&
                 self.id == other.id &&
                 self.images == other.images &&
-                self.popularity == other.popularity &&
-                self.label == other.label &&
                 self.genres == other.genres &&
                 self.totalTracks == other.totalTracks &&
                 self.href == other.href &&
                 self.externalURLs == other.externalURLs &&
-                self.externalIds == other.externalIds &&
-                self.albumType == other.albumType &&
-                self.albumGroup == other.albumGroup &&
-                self.availableMarkets == other.availableMarkets &&
                 self.copyrights == other.copyrights &&
                 self.releaseDatePrecision == other.releaseDatePrecision &&
                 self.restrictions == other.restrictions &&

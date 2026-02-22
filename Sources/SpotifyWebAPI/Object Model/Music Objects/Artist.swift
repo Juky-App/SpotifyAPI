@@ -22,17 +22,6 @@ public struct Artist: Hashable {
     public let images: [SpotifyImage]?
     
     /**
-     The popularity of the artist.
-    
-     The value will be between 0 and 100, with 100 being the most popular. The
-     artist’s popularity is calculated from the popularity of all the artist’s
-     tracks.
-    
-     Only available for the full artist object.
-     */
-    public let popularity: Int?
-    
-    /**
      Known external urls for this artist.
     
      - key: The type of the URL, for example: "spotify" - The [Spotify URL][1]
@@ -42,11 +31,6 @@ public struct Artist: Hashable {
      [1]: https://developer.spotify.com/documentation/web-api/concepts/spotify-uris-ids
      */
     public let externalURLs: [String: URL]?
-    
-    /// Information about the followers of the artist.
-    ///
-    /// Only available for the full artist object.
-    public let followers: Followers?
     
     /**
      A list of the genres the artist is associated with.
@@ -77,13 +61,10 @@ public struct Artist: Hashable {
        - uri: The [Spotify URI][1] for the artist.
        - id: The [Spotify ID][1] for the artist.
        - images: Images of the artist.
-       - popularity: The popularity of the artist. Should be between 0 and 100,
-             inclusive.
        - externalURLs: Known external urls for this artist.
              - key: The type of the URL, for example: "spotify" - The [Spotify
                    URL][1] for the object.
              - value: An external, public URL to the object.
-       - followers: Information about the followers of the artist.
        - genres: A list of the genres the artist is associated with.
        - href: A link to the Spotify web API endpoint providing the full
              artist object.
@@ -95,9 +76,7 @@ public struct Artist: Hashable {
         uri: String? = nil,
         id: String? = nil,
         images: [SpotifyImage]? = nil,
-        popularity: Int? = nil,
         externalURLs: [String: URL]? = nil,
-        followers: Followers? = nil,
         genres: [String]? = nil,
         href: URL? = nil
     ) {
@@ -105,9 +84,7 @@ public struct Artist: Hashable {
         self.uri = uri
         self.id = id
         self.images = images
-        self.popularity = popularity
         self.externalURLs = externalURLs
-        self.followers = followers
         self.genres = genres
         self.href = href
         self.type = .artist
@@ -135,16 +112,8 @@ extension Artist: Codable {
 
         self.images = try container.decodeSpotifyImages(forKey: .images)
 
-        self.popularity =  try container.decodeIfPresent(
-            Int.self, forKey: .popularity
-        )
-
         self.externalURLs =  try container.decodeIfPresent(
             [String: URL].self, forKey: .externalURLs
-        )
-        
-        self.followers =  try container.decodeIfPresent(
-            Followers.self, forKey: .followers
         )
 
         self.genres = try container.decodeAndUnwrapArray(forKey: .genres)
@@ -164,9 +133,7 @@ extension Artist: Codable {
         case uri
         case id
         case images
-        case popularity
         case externalURLs = "external_urls"
-        case followers
         case genres
         case href
         case type

@@ -55,17 +55,6 @@ public struct AudiobookChapter: Hashable, SpotifyURIConvertible {
     public let images: [SpotifyImage]?
     
     /**
-     A list of the countries in which the chapter can be played, identified
-     by their [ISO 3166-1 alpha-2][1] codes.
-     
-     If a market parameter was supplied in the request that returned this
-     chapter, then this property will be `nil`.
-    
-     [1]: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-     */
-    public let availableMarkets: [String]?
-    
-    /**
      A link to the Spotify web API endpoint providing the full chapter object.
      
      Use ``SpotifyAPI/getFromHref(_:responseType:)``, passing in
@@ -140,8 +129,6 @@ public struct AudiobookChapter: Hashable, SpotifyURIConvertible {
        - uri: The [Spotify URI][1] for the chapter.
        - id: The [Spotify ID][1] for the chapter.
        - images: Images for the chapter in various sizes, widest first.
-       - availableMarkets: A list of the countries in which the chapter can be
-             played, identified by their [ISO 3166-1 alpha-2][2] codes.
        - href: A link to the Spotify web API endpoint providing the full chapter
              object. Use ``SpotifyAPI/getFromHref(_:responseType:)``, passing in
              ``AudiobookChapter`` as the response type to retrieve the results.
@@ -185,7 +172,6 @@ public struct AudiobookChapter: Hashable, SpotifyURIConvertible {
         uri: String,
         id: String,
         images: [SpotifyImage]? = nil,
-        availableMarkets: [String]? = nil,
         href: URL,
         isPlayable: Bool?,
         externalURLs: [String : URL]? = nil,
@@ -206,7 +192,6 @@ public struct AudiobookChapter: Hashable, SpotifyURIConvertible {
         self.uri = uri
         self.id = id
         self.images = images
-        self.availableMarkets = availableMarkets
         self.href = href
         self.isPlayable = isPlayable
         self.externalURLs = externalURLs
@@ -234,7 +219,6 @@ extension AudiobookChapter: Codable {
         case uri
         case id
         case images
-        case availableMarkets = "available_markets"
         case href
         case isPlayable = "is_playable"
         case externalURLs = "external_urls"
@@ -303,10 +287,6 @@ extension AudiobookChapter: Codable {
         )
         
         self.images = try container.decodeSpotifyImages(forKey: .images)
-        
-        self.availableMarkets = try container.decodeAndUnwrapArray(
-            forKey: .availableMarkets
-        )
 
         self.href = try container.decode(
             URL.self, forKey: .href
@@ -374,9 +354,6 @@ extension AudiobookChapter: Codable {
         try container.encodeIfPresent(
             self.images, forKey: .images
         )
-        try container.encodeIfPresent(
-            self.availableMarkets, forKey: .availableMarkets
-        )
         try container.encode(
             self.href, forKey: .href
         )
@@ -432,7 +409,6 @@ extension AudiobookChapter: ApproximatelyEquatable {
                 self.uri == other.uri &&
                 self.id == other.id &&
                 self.images == other.images &&
-                self.availableMarkets == other.availableMarkets &&
                 self.href == other.href &&
                 self.isPlayable == other.isPlayable &&
                 self.externalURLs == other.externalURLs &&

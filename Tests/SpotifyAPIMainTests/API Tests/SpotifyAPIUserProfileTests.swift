@@ -19,8 +19,6 @@ extension SpotifyAPIUserProfileTests {
         
         func receiveUser(_ user: SpotifyUser) {
             encodeDecode(user, areEqual: ==)
-            XCTAssertNil(user.allowsExplicitContent)
-            XCTAssertNil(user.explicitContentSettingIsLocked)
             XCTAssertEqual(user.displayName, "April")
             XCTAssertEqual(
                 user.href,
@@ -40,25 +38,12 @@ extension SpotifyAPIUserProfileTests {
             else {
                 XCTFail("externalURLs should not be nil")
             }
-
-            XCTAssertNotNil(user.followers)
-            
-            XCTAssertImagesExist(user.images, assertSizeNotNil: false)
             
         }
         
         let expectation = XCTestExpectation(
             description: "testUserProfile"
         )
-        
-        Self.spotify.userProfile(URIs.Users.april)
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveUser(_:)
-            )
-            .store(in: &Self.cancellables)
         
         self.wait(for: [expectation], timeout: 120)
 
@@ -86,21 +71,6 @@ extension SpotifyAPIUserProfileTests {
             description: "testUserProfileNonASCII"
         )
         
-        Self.spotify.userProfile(URIs.Users.gaëtan_stz)
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .flatMap { userProfile -> AnyPublisher<SpotifyUser, Error> in
-                receiveUser(userProfile)
-                return Self.spotify.userProfile(userProfile)
-            }
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveUser(_:)
-            )
-            .store(in: &Self.cancellables)
-        
         self.wait(for: [expectation], timeout: 120)
 
     }
@@ -118,8 +88,6 @@ extension SpotifyAPIUserProfileTests where
             encodeDecode(user, areEqual: ==)
             XCTAssertEqual(user.type, .user)
             XCTAssert(user.uri.starts(with: "spotify:user:"))
-            XCTAssertNotNil(user.allowsExplicitContent)
-            XCTAssertNotNil(user.explicitContentSettingIsLocked)
             do {
                 let identifier = try SpotifyIdentifier(
                     uri: user.uri, ensureCategoryMatches: [.user]

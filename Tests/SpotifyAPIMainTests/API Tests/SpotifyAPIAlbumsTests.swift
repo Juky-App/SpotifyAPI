@@ -23,16 +23,9 @@ extension SpotifyAPIAlbumsTests {
         XCTAssertEqual(album.uri, "spotify:album:3vukTUpiENDHDoYTVrwqtz")
         XCTAssertEqual(album.id, "3vukTUpiENDHDoYTVrwqtz")
         XCTAssertEqual(album.albumType, .album)
-        XCTAssertEqual(album.label, "Crumb Records")
         XCTAssertEqual(album.type, .album)
         XCTAssertEqual(album.tracks?.items.count, 10)
         XCTAssertEqual(album.tracks?.total, 10)
-        if let popularity = album.popularity {
-            XCTAssert((0...100).contains(popularity), "\(popularity)")
-        }
-        else {
-            XCTFail("popularity should not be nil")
-        }
         
         // XCTAssertEqual(album.availableMarkets?.contains("US"), true)
         
@@ -64,16 +57,6 @@ extension SpotifyAPIAlbumsTests {
         }
         else {
             XCTFail("externalURLs should not be nil")
-        }
-        
-        if let externalIds = album.externalIds {
-            XCTAssertEqual(
-                externalIds["upc"], "656605343648",
-                "\(externalIds)"
-            )
-        }
-        else {
-            XCTFail("externalIds should not be nil")
         }
         
         
@@ -187,65 +170,6 @@ extension SpotifyAPIAlbumsTests {
                 "authorizationManagerDidChange should emit exactly once"
             )
         }
-        
-    }
-   
-    func albums() {
-
-        func receiveAlbums(_ albums: [Album?]) {
-
-            if let jinxAlbum = albums[0] {
-                receiveJinxAlbum(jinxAlbum)
-            }
-            else {
-                XCTFail("jinx album should not be nil")
-            }
-            
-            for album in albums {
-                encodeDecode(album)
-            }
-            
-            guard albums.count == 3 else {
-                XCTFail("should've received 3 albums (got \(albums.count)")
-                return
-            }
-            
-            XCTAssertEqual(albums[0]?.name, "Jinx")
-            
-            
-            XCTAssertEqual(albums[1]?.name, "Locket")
-            XCTAssertEqual(albums[2]?.name, "Meddle")
-
-            XCTAssertEqual(albums[0]?.tracks?.items.count, Int(10))
-            XCTAssertEqual(albums[1]?.tracks?.items.count, 4)
-            XCTAssertEqual(albums[2]?.tracks?.items.count, 6)
-
-            XCTAssertEqual(albums[0]?.releaseDate, "2019-06-14")
-            XCTAssertEqual(albums[1]?.releaseDate, "2017-06-23")
-            XCTAssertEqual(albums[2]?.releaseDate, "1971-11-11")
-
-
-            
-        }
-        
-        let expectation = XCTestExpectation(description: "testAlbums")
-        
-        let albums: [SpotifyURIConvertible] = [
-            URIs.Albums.jinx,
-            URIs.Albums.locket,
-            URIs.Albums.meddle
-        ]
-        
-        Self.spotify.albums(albums)
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveAlbums(_:)
-            )
-            .store(in: &Self.cancellables)
-        
-        self.wait(for: [expectation], timeout: 120)
         
     }
     
@@ -947,7 +871,6 @@ final class SpotifyAPIClientCredentialsFlowAlbumsTests:
 
     static let allTests = [
         ("testAlbumJinx", testAlbumJinx),
-        ("testAlbums", testAlbums),
         ("testTheLongestAlbumTracks", testTheLongestAlbumTracks),
         ("testTheLongestAlbumTracks2", testTheLongestAlbumTracks2),
         (
@@ -965,7 +888,6 @@ final class SpotifyAPIClientCredentialsFlowAlbumsTests:
     ]
 
     func testAlbumJinx() { albumJinx() }
-    func testAlbums() { albums() }
     func testTheLongestAlbumTracks() { theLongestAlbumTracks() }
     func testTheLongestAlbumTracks2() { theLongestAlbumTracks2() }
     func testTheLongestAlbumTracksConcurrent() { theLongestAlbumTracksConcurrent() }
@@ -982,7 +904,6 @@ final class SpotifyAPIAuthorizationCodeFlowAlbumsTests:
 
     static let allTests = [
         ("testAlbumJinx", testAlbumJinx),
-        ("testAlbums", testAlbums),
         ("testTheLongestAlbumTracks", testTheLongestAlbumTracks),
         ("testTheLongestAlbumTracks2", testTheLongestAlbumTracks2),
         (
@@ -1000,7 +921,6 @@ final class SpotifyAPIAuthorizationCodeFlowAlbumsTests:
     ]
 
     func testAlbumJinx() { albumJinx() }
-    func testAlbums() { albums() }
     func testTheLongestAlbumTracks() { theLongestAlbumTracks() }
     func testTheLongestAlbumTracks2() { theLongestAlbumTracks2() }
     func testTheLongestAlbumTracksConcurrent() { theLongestAlbumTracksConcurrent() }
@@ -1017,7 +937,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEAlbumsTests:
 
     static let allTests = [
         ("testAlbumJinx", testAlbumJinx),
-        ("testAlbums", testAlbums),
         ("testTheLongestAlbumTracks", testTheLongestAlbumTracks),
         ("testTheLongestAlbumTracks2", testTheLongestAlbumTracks2),
         (
@@ -1035,7 +954,6 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEAlbumsTests:
     ]
 
     func testAlbumJinx() { albumJinx() }
-    func testAlbums() { albums() }
     func testTheLongestAlbumTracks() { theLongestAlbumTracks() }
     func testTheLongestAlbumTracks2() { theLongestAlbumTracks2() }
     func testTheLongestAlbumTracksConcurrent() { theLongestAlbumTracksConcurrent() }

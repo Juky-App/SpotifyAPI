@@ -30,7 +30,7 @@ private extension SpotifyAPI {
             ).id
             
             return self.apiRequest(
-                path: "/playlists/\(playlistId)/tracks",
+                path: "/playlists/\(playlistId)/items",
                 queryItems: queryItems,
                 httpMethod: httpMethod,
                 makeHeaders: Headers.bearerAuthorizationAndContentTypeJSON(_:),
@@ -77,7 +77,7 @@ private extension SpotifyAPI {
             )?.commaSeparatedString()
         
             return self.getRequest(
-                path: "/playlists/\(playlistId)/tracks",
+                path: "/playlists/\(playlistId)/items",
                 queryItems: [
                     "fields": filters,
                     "limit": limit,
@@ -597,82 +597,6 @@ public extension SpotifyAPI {
             PlaylistItems.self,
             maxRetryDelay: self.maxRetryDelay
         )
-        
-    }
-    
-    /**
-     Get a list of the playlists for a user, including those that
-     they are following.
-     
-     See also ``currentUserPlaylists(limit:offset:)``.
-     
-     No scopes are required for retrieving the public playlists of any user.
-     Private playlists are only retrievable for the current user and requires
-     the ``Scope/playlistReadPrivate`` scope to have been authorized by the
-     user. Note that this scope alone will not return collaborative playlists,
-     even though they are always private. Collaborative playlists are only
-     retrievable for the current user and requires the
-     ``Scope/playlistReadCollaborative`` scope to have been authorized by the
-     user. See also [Working with Playlists][1].
-     
-     **Returns:**
-     ```
-     PagingObject<Playlist<PlaylistItemsReference>
-     ```
-     
-     The simplified versions of the playlists will be returned.
-     
-     A ``PlaylistItemsReference`` simply contains a link to all of the
-     tracks/episodes and the total number in the playlist. To get all of the
-     tracks and episodes in each playlist, you can use
-     ``playlistItems(_:limit:offset:market:)``, passing in the URI of each of the
-     playlists. To get all of the URIs, use:
-     ```
-     let uris: [String] = playlists.items.map(\.uri)
-     ```
-     
-     Read more at the [Spotify web API reference][2].
-     
-     - Parameters:
-       - userURI: the URI of a Spotify user.
-       - limit: The maximum number of playlists to return. Default: 20; Minimum:
-             1; Maximum: 50.
-       - offset: The index of the first playlist to return. Default: 0; Maximum:
-             100,000. Use with `limit` to get the next set of
-             playlists.
-     
-     [1]: https://developer.spotify.com/documentation/general/guides/working-with-playlists/
-     [2]: https://developer.spotify.com/documentation/web-api/reference/#/operations/get-list-users-playlists
-     */
-    func userPlaylists(
-        for userURI: SpotifyURIConvertible,
-        limit: Int? = nil,
-        offset: Int? = nil
-    ) -> AnyPublisher<PagingObject<Playlist<PlaylistItemsReference>>, Error> {
-        
-        do {
-            
-            let userId = try SpotifyIdentifier(
-                uri: userURI, ensureCategoryMatches: [.user]
-            ).id
-        
-            return self.getRequest(
-                path: "/users/\(userId)/playlists",
-                queryItems: [
-                    "limit": limit,
-                    "offset": offset
-                ],
-                requiredScopes: []
-            )
-            .decodeSpotifyObject(
-                PagingObject<Playlist<PlaylistItemsReference>>.self,
-                maxRetryDelay: self.maxRetryDelay
-            )
-    
-        } catch {
-            return error.anyFailingPublisher()
-        }
-        
         
     }
     

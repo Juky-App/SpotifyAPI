@@ -41,23 +41,6 @@ public struct Track: Hashable {
     /// [1]: https://developer.spotify.com/documentation/general/guides/working-with-playlists/#local-files
     public let isLocal: Bool
     
-    /**
-     The popularity of the track.
-     
-     The value will be between 0 and 100, with 100 being the most popular. The
-     popularity is calculated by algorithm and is based, in the most part, on
-     the total number of plays the track has had and how recent those plays are.
-     Generally speaking, songs that are being played a lot now will have a
-     higher popularity than songs that were played a lot in the past. Duplicate
-     tracks (e.g. the same track from a single and an album) are rated
-     independently. Artist and album popularity is derived mathematically from
-     track popularity. Note that the popularity value may lag actual popularity
-     by a few days: the value is not updated in real time.
-     
-     Only available for the full track object.
-     */
-    public let popularity: Int?
-    
     /// The track length in milliseconds.
     public let durationMS: Int?
 
@@ -107,36 +90,6 @@ public struct Track: Hashable {
      */
     public let externalURLs: [String: URL]?
     
-    /// Known external IDs for the track.
-    ///
-    /// Only available for the full track object.
-    public let externalIds: [String: String]?
-    
-    /**
-     A list of the countries in which the track can be played, identified by
-     their [ISO 3166-1 alpha-2][1] codes.
-    
-     If a market parameter was supplied in the request that returned this track,
-     then this property will be `nil` and ``isPlayable`` will be non-`nil`.
-    
-     See also ``restrictions`` and the [Track Relinking Guide][2].
-     
-     [1]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-     [2]: https://developer.spotify.com/documentation/general/guides/track-relinking-guide/
-     */
-    public let availableMarkets: [String]?
-
-    /**
-     Part of the response when Track Relinking is applied, and the
-     requested track has been replaced with different track. The track link
-     contains information about the originally requested track.
-    
-     Read more at the [Spotify web API reference][1].
-
-     [1]: https://developer.spotify.com/documentation/general/guides/track-relinking-guide/
-     */
-    public let linkedFrom: TrackLink?
-    
     /**
      Part of the response when a content restriction, such as Track
      Relinking, is applied.
@@ -181,8 +134,6 @@ public struct Track: Hashable {
        - uri: The [Spotify URI][2] for the track.
        - id: The [Spotify ID][2] for the track.
        - isLocal: Whether or not the track is from a [local file][3].
-       - popularity: The popularity of the track. Should be between 0 and 100,
-             inclusive.
        - durationMS: The track length in milliseconds.
        - trackNumber: The number of the track. If an album has several discs,
              the track number is the number on the specified disc.
@@ -197,13 +148,6 @@ public struct Track: Hashable {
              - key: The type of the URL, for example: "spotify" - The [Spotify
                    URL][2] for the object.
              - value: An external, public URL to the object.
-       - externalIds: Known external IDs for the track.
-       - availableMarkets: A list of the countries in which the track can be
-             played, identified by their [ISO 3166-1 alpha-2][4] codes.
-       - linkedFrom: Part of the response when [Track Relinking][1] is applied,
-             and the requested track has been replaced with different track.
-             The track link contains information about the originally requested
-             track.
        - restrictions: Part of the response when a content restriction, such as
              [Track Relinking][1], is applied. Else, `nil`. The key will be
              "reason", and the value will be one of the following:
@@ -232,7 +176,6 @@ public struct Track: Hashable {
         uri: String? = nil,
         id: String? = nil,
         isLocal: Bool,
-        popularity: Int? = nil,
         durationMS: Int? = nil,
         trackNumber: Int? = nil,
         isExplicit: Bool,
@@ -240,9 +183,6 @@ public struct Track: Hashable {
         href: URL? = nil,
         previewURL: URL? = nil,
         externalURLs: [String: URL]? = nil,
-        externalIds: [String: String]? = nil,
-        availableMarkets: [String]? = nil,
-        linkedFrom: TrackLink? = nil,
         restrictions: [String: String]? = nil,
         discNumber: Int? = nil,
         type: IDCategory = .track
@@ -253,7 +193,6 @@ public struct Track: Hashable {
         self.uri = uri
         self.id = id
         self.isLocal = isLocal
-        self.popularity = popularity
         self.durationMS = durationMS
         self.trackNumber = trackNumber
         self.isExplicit = isExplicit
@@ -261,9 +200,6 @@ public struct Track: Hashable {
         self.href = href
         self.previewURL = previewURL
         self.externalURLs = externalURLs
-        self.externalIds = externalIds
-        self.availableMarkets = availableMarkets
-        self.linkedFrom = linkedFrom
         self.restrictions = restrictions
         self.discNumber = discNumber
         self.type = type
@@ -295,9 +231,6 @@ extension Track: Codable {
         self.isLocal = try container.decodeIfPresent(
             Bool.self, forKey: .isLocal
         ) ?? false
-        self.popularity = try container.decodeIfPresent(
-            Int.self, forKey: .popularity
-        )
         self.durationMS = try container.decodeIfPresent(
             Int.self, forKey: .durationMS
         )
@@ -319,17 +252,6 @@ extension Track: Codable {
         self.externalURLs = try container.decodeIfPresent(
             [String: URL].self, forKey: .externalURLs
         )
-        self.externalIds = try container.decodeIfPresent(
-            [String: String].self, forKey: .externalIds
-        )
-
-        self.availableMarkets = try container.decodeAndUnwrapArray(
-            forKey: .availableMarkets
-        )
-
-        self.linkedFrom = try container.decodeIfPresent(
-            TrackLink.self, forKey: .linkedFrom
-        )
         self.restrictions = try container.decodeIfPresent(
             [String: String].self, forKey: .restrictions
         )
@@ -349,7 +271,6 @@ extension Track: Codable {
         case uri
         case id
         case isLocal = "is_local"
-        case popularity
         case durationMS = "duration_ms"
         case trackNumber = "track_number"
         case isExplicit = "explicit"
@@ -357,9 +278,6 @@ extension Track: Codable {
         case href
         case previewURL = "preview_url"
         case externalURLs = "external_urls"
-        case externalIds = "external_ids"
-        case availableMarkets = "available_markets"
-        case linkedFrom = "linked_from"
         case restrictions
         case discNumber = "disc_number"
         case type
@@ -376,7 +294,6 @@ extension Track: Codable {
         try container.encodeIfPresent(self.uri, forKey: .uri)
         try container.encodeIfPresent(self.id, forKey: .id)
         try container.encode(self.isLocal, forKey: .isLocal)
-        try container.encodeIfPresent(self.popularity, forKey: .popularity)
         try container.encodeIfPresent(self.durationMS, forKey: .durationMS)
         try container.encodeIfPresent(self.trackNumber, forKey: .trackNumber)
         try container.encode(self.isExplicit, forKey: .isExplicit)
@@ -384,9 +301,6 @@ extension Track: Codable {
         try container.encodeIfPresent(self.href, forKey: .href)
         try container.encodeIfPresent(self.previewURL, forKey: .previewURL)
         try container.encodeIfPresent(self.externalURLs, forKey: .externalURLs)
-        try container.encodeIfPresent(self.externalIds, forKey: .externalIds)
-        try container.encodeIfPresent(self.availableMarkets, forKey: .availableMarkets)
-        try container.encodeIfPresent(self.linkedFrom, forKey: .linkedFrom)
         try container.encodeIfPresent(self.restrictions, forKey: .restrictions)
         try container.encodeIfPresent(self.discNumber, forKey: .discNumber)
         try container.encode(self.type, forKey: .type)
@@ -415,7 +329,6 @@ extension Track: ApproximatelyEquatable {
                 self.uri == other.uri &&
                 self.id == other.id &&
                 self.isLocal == other.isLocal &&
-                self.popularity == other.popularity &&
                 self.durationMS == other.durationMS &&
                 self.trackNumber == other.trackNumber &&
                 self.isExplicit == other.isExplicit &&
@@ -423,9 +336,6 @@ extension Track: ApproximatelyEquatable {
                 self.href == other.href &&
                 self.previewURL == other.previewURL &&
                 self.externalURLs == other.externalURLs &&
-                self.externalIds == other.externalIds &&
-                self.availableMarkets == other.availableMarkets &&
-                self.linkedFrom == other.linkedFrom &&
                 self.restrictions == other.restrictions &&
                 self.discNumber == other.discNumber &&
                 self.type == other.type &&

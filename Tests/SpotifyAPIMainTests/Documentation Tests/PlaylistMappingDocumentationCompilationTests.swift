@@ -36,16 +36,6 @@ private extension SpotifyAPI {
         
     }
     
-    func _testUserPlaylistsMapping() {
-        
-        _ = self.userPlaylists(for: "")
-            .sinkIgnoringCompletion { (playlists: PagingObject<Playlist<PlaylistItemsReference>>) in
-                let uris: [String] = playlists.items.map(\.uri)
-                _ = uris
-            }
-
-    }
-    
 }
 
 private extension SpotifyAPI where

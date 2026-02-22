@@ -22,7 +22,6 @@ extension SpotifyAPIShowTests {
             show.name,
             "Sean Carroll's Mindscape: Science, Society, Philosophy, Culture, Arts, and Ideas"
         )
-        XCTAssertEqual(show.publisher, "Sean Carroll | Wondery")
         XCTAssertTrue(show.isExplicit)
         XCTAssertEqual(show.uri, "spotify:show:622lvLwp8CVu6dvCsYAJhN")
         XCTAssertEqual(show.id, "622lvLwp8CVu6dvCsYAJhN")
@@ -144,7 +143,6 @@ extension SpotifyAPIShowTests {
             else {
                 XCTFail("total episodes should not be nil")
             }
-            XCTAssertEqual(joeRogan.publisher, "Joe Rogan")
             XCTAssertEqual(joeRogan.type, .show)
             XCTAssertEqual(joeRogan.uri, "spotify:show:4rOoJ6Egrf8K2IrywzwOMk")
             XCTAssertEqual(joeRogan.id, "4rOoJ6Egrf8K2IrywzwOMk")
@@ -183,15 +181,6 @@ extension SpotifyAPIShowTests {
             URIs.Shows.seanCarroll,
             URIs.Shows.joeRogan
         ]
-        
-        Self.spotify.shows(shows, market: "US")
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveShows(_:)
-            )
-            .store(in: &Self.cancellables)
         
         self.wait(for: [expectation], timeout: 120)
         

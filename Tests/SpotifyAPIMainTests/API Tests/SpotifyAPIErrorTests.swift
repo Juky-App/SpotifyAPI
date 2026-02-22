@@ -905,19 +905,6 @@ extension SpotifyAPIErrorTests where
             return
         }
         
-        let unfollowExpectation = XCTestExpectation(
-            description: "unfollow playlist"
-        )
-    
-        Self.spotify.unfollowPlaylistForCurrentUser(playlist)
-            .XCTAssertNoFailure()
-            .sink(receiveCompletion: { _ in
-                unfollowExpectation.fulfill()
-            })
-            .store(in: &Self.cancellables)
-        
-        self.wait(for: [unfollowExpectation], timeout: 60)
-        
         spotifyDecodeLogger.logLevel = spotifyDecodeLogLevel
         Self.spotify.apiRequestLogger.logLevel = apiRequestLogLevel
             

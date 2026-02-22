@@ -87,7 +87,6 @@ extension SpotifyAPIAudiobookTests {
         XCTAssertEqual(audiobook.name, "Harry Potter and the Sorcerer's Stone")
         XCTAssertEqual(audiobook.narrators.count, 1)
         XCTAssertEqual(audiobook.narrators.first?.name, "Jim Dale")
-        XCTAssertEqual(audiobook.publisher, "J.K. Rowling")
         XCTAssertEqual(audiobook.totalChapters, 20)
         XCTAssertEqual(audiobook.type, .audiobook)
         XCTAssertEqual(audiobook.uri, "spotify:show:2IEBhnu61ieYGFRPEJIO40")
@@ -263,197 +262,6 @@ extension SpotifyAPIAudiobookTests {
 
     }
 
-    func audiobooks() {
-
-        func receiveAudiobooks(_ audiobooks: [Audiobook?]) {
-
-            encodeDecode(audiobooks)
-
-            let audiobooks = audiobooks.enumerated().compactMap {
-                audiobook -> Audiobook? in
-
-                XCTAssertNotNil(
-                    audiobook.element,
-                    "audiobook at index \(audiobook.offset) was nil"
-                )
-
-                return audiobook.element
-            }
-
-            guard audiobooks.count == 4 else {
-                // we already display errors above if one or more elements
-                // was nil
-                return
-            }
-
-            self.receiveHarryPotterAndTheSorcerersStone(
-                audiobooks[0]
-            )
-
-            // MARK: Enlighenment Now
-            do {
-                let audiobook = audiobooks[1]
-                XCTAssertEqual(audiobook.authors.count, 1)
-                XCTAssertEqual(audiobook.authors.first?.name, "Steven Pinker")
-                XCTAssertEqual(
-                    audiobook.description,
-                    """
-                    Author(s): Steven Pinker
-                    Narrator(s): Arthur Morey
-                    
-                    <b><b>INSTANT <i>NEW YORK TIMES</i> BESTSELLER <br>A <i>NEW YORK TIMES</i> NOTABLE BOOK OF 2018<br>ONE OF <i>THE ECONOMIST'S</i> BOOKS OF THE YEAR<br></b><br><b>"My new favorite book of all time." --Bill Gates </b><br><br>If you think the world is coming to an end, think again: people are living longer, healthier, freer, and happier lives, and while our problems are formidable, the solutions lie in the Enlightenment ideal of using reason and science. By the author of the new book, <i>Rationality</i>.</b> <br><br>Is the world really falling apart? Is the ideal of progress obsolete? In this elegant assessment of the human condition in the third millennium, cognitive scientist and public intellectual Steven Pinker urges us to step back from the gory headlines and prophecies of doom, which play to our psychological biases. Instead, follow the data: In seventy-five jaw-dropping graphs, Pinker shows that life, health, prosperity, safety, peace, knowledge, and happiness are on the rise, not just in the West, but worldwide. This progress is not the result of some cosmic force. It is a gift of the Enlightenment: the conviction that reason and science can enhance human flourishing.<br><br>Far from being a naïve hope, the Enlightenment, we now know, has worked. But more than ever, it needs a vigorous defense. The Enlightenment project swims against currents of human nature--tribalism, authoritarianism, demonization, magical thinking--which demagogues are all too willing to exploit. Many commentators, committed to political, religious, or romantic ideologies, fight a rearguard action against it. The result is a corrosive fatalism and a willingness to wreck the precious institutions of liberal democracy and global cooperation. <br><br>With intellectual depth and literary flair, <i>Enlightenment Now</i> makes the case for reason, science, and humanism: the ideals we need to confront our problems and continue our progress.
-                    """
-                )
-                XCTAssertEqual(
-                    audiobook.htmlDescription,
-                    """
-                    Author(s): Steven Pinker<br/>Narrator(s): Arthur Morey<br/>&lt;b&gt;&lt;b&gt;INSTANT &lt;i&gt;NEW YORK TIMES&lt;/i&gt; BESTSELLER &lt;br&gt;A &lt;i&gt;NEW YORK TIMES&lt;/i&gt; NOTABLE BOOK OF 2018&lt;br&gt;ONE OF &lt;i&gt;THE ECONOMIST&#39;S&lt;/i&gt; BOOKS OF THE YEAR&lt;br&gt;&lt;/b&gt;&lt;br&gt;&lt;b&gt;&#34;My new favorite book of all time.&#34; --Bill Gates &lt;/b&gt;&lt;br&gt;&lt;br&gt;If you think the world is coming to an end, think again: people are living longer, healthier, freer, and happier lives, and while our problems are formidable, the solutions lie in the Enlightenment ideal of using reason and science. By the author of the new book, &lt;i&gt;Rationality&lt;/i&gt;.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Is the world really falling apart? Is the ideal of progress obsolete? In this elegant assessment of the human condition in the third millennium, cognitive scientist and public intellectual Steven Pinker urges us to step back from the gory headlines and prophecies of doom, which play to our psychological biases. Instead, follow the data: In seventy-five jaw-dropping graphs, Pinker shows that life, health, prosperity, safety, peace, knowledge, and happiness are on the rise, not just in the West, but worldwide. This progress is not the result of some cosmic force. It is a gift of the Enlightenment: the conviction that reason and science can enhance human flourishing.&lt;br&gt;&lt;br&gt;Far from being a naïve hope, the Enlightenment, we now know, has worked. But more than ever, it needs a vigorous defense. The Enlightenment project swims against currents of human nature--tribalism, authoritarianism, demonization, magical thinking--which demagogues are all too willing to exploit. Many commentators, committed to political, religious, or romantic ideologies, fight a rearguard action against it. The result is a corrosive fatalism and a willingness to wreck the precious institutions of liberal democracy and global cooperation. &lt;br&gt;&lt;br&gt;With intellectual depth and literary flair, &lt;i&gt;Enlightenment Now&lt;/i&gt; makes the case for reason, science, and humanism: the ideals we need to confront our problems and continue our progress.
-                    """
-                )
-                XCTAssertEqual(audiobook.edition, "Unabridged")
-                XCTAssertEqual(audiobook.isExplicit, false)
-                XCTAssertEqual(audiobook.id, "2fUedmI8FowN4xYJuMIDfi")
-                XCTAssertEqual(audiobook.uri, "spotify:show:2fUedmI8FowN4xYJuMIDfi")
-                XCTAssertNotNil(audiobook.images)
-                XCTAssertEqual(audiobook.languages.first, "en")
-                XCTAssertEqual(audiobook.mediaType, "audio")
-                XCTAssertEqual(audiobook.publisher, "Steven Pinker")
-                XCTAssertEqual(
-                    audiobook.name,
-                    "Enlightenment Now: The Case for Reason, Science, Humanism, and Progress"
-                )
-                XCTAssertEqual(audiobook.narrators.count, 1)
-                XCTAssertEqual(audiobook.narrators.first?.name, "Arthur Morey")
-                XCTAssertEqual(audiobook.totalChapters, 28)
-                XCTAssertEqual(audiobook.type, .audiobook)
-                XCTAssertEqual(
-                    audiobook.chapters?.href.removingLocaleQueryParam,
-                    URL(string: "https://api.spotify.com/v1/audiobooks/2fUedmI8FowN4xYJuMIDfi/chapters?offset=0&limit=50&market=US")
-                )
-                XCTAssertEqual(audiobook.chapters?.items.count, 28)
-                XCTAssertEqual(audiobook.chapters?.limit, 50)
-                XCTAssertNil(audiobook.chapters?.next)
-                XCTAssertEqual(audiobook.chapters?.offset, 0)
-                XCTAssertNil(audiobook.chapters?.previous)
-                XCTAssertEqual(audiobook.chapters?.total, 28)
-            }
-
-            // MARK: Free Will
-            do {
-                let audiobook = audiobooks[2]
-                XCTAssertEqual(audiobook.authors.count, 1)
-                XCTAssertEqual(audiobook.authors.first?.name, "Sam Harris")
-                XCTAssertEqual(
-                    audiobook.description,
-                    """
-                    Author(s): Sam Harris
-                    Narrator(s): Sam Harris
-                    
-                    <b>From the <i>New York Times </i>bestselling author of <i>The End of Faith</i>, a thought-provoking, "brilliant and witty" (Oliver Sacks) look at the notion of free will</b><b>—and the implications that it is an illusion.</b><br><br>A belief in free will touches nearly everything that human beings value. It is difficult to think about law, politics, religion, public policy, intimate relationships, morality—as well as feelings of remorse or personal achievement—without first imagining that every person is the true source of his or her thoughts and actions. And yet the facts tell us that free will is an illusion.<br> <br> In this enlightening book, Sam Harris argues that this truth about the human mind does not undermine morality or diminish the importance of social and political freedom, but it can and should change the way we think about some of the most important questions in life.
-                    """
-                )
-                XCTAssertEqual(
-                    audiobook.htmlDescription,
-                    """
-                    Author(s): Sam Harris<br/>Narrator(s): Sam Harris<br/>&lt;b&gt;From the &lt;i&gt;New York Times &lt;/i&gt;bestselling author of &lt;i&gt;The End of Faith&lt;/i&gt;, a thought-provoking, &#34;brilliant and witty&#34; (Oliver Sacks) look at the notion of free will&lt;/b&gt;&lt;b&gt;—and the implications that it is an illusion.&lt;/b&gt;&lt;br&gt;&lt;br&gt;A belief in free will touches nearly everything that human beings value. It is difficult to think about law, politics, religion, public policy, intimate relationships, morality—as well as feelings of remorse or personal achievement—without first imagining that every person is the true source of his or her thoughts and actions. And yet the facts tell us that free will is an illusion.&lt;br&gt; &lt;br&gt; In this enlightening book, Sam Harris argues that this truth about the human mind does not undermine morality or diminish the importance of social and political freedom, but it can and should change the way we think about some of the most important questions in life.
-                    """
-                )
-                XCTAssertEqual(audiobook.edition, "Unabridged")
-                XCTAssertEqual(audiobook.isExplicit, false)
-                XCTAssertEqual(audiobook.id, "4x3Y9YYK84XJSTTJp2atHe")
-                XCTAssertEqual(audiobook.uri, "spotify:show:4x3Y9YYK84XJSTTJp2atHe")
-                XCTAssertNotNil(audiobook.images)
-                XCTAssertEqual(audiobook.languages.first, "en")
-                XCTAssertEqual(audiobook.mediaType, "audio")
-                XCTAssertEqual(audiobook.publisher, "Sam Harris")
-                XCTAssertEqual(audiobook.name, "Free Will")
-                XCTAssertEqual(audiobook.narrators.count, 1)
-                XCTAssertEqual(audiobook.narrators.first?.name, "Sam Harris")
-                XCTAssertEqual(audiobook.totalChapters, 12)
-                XCTAssertEqual(audiobook.type, .audiobook)
-                XCTAssertEqual(
-                    audiobook.chapters?.href.removingLocaleQueryParam,
-                    URL(string: "https://api.spotify.com/v1/audiobooks/4x3Y9YYK84XJSTTJp2atHe/chapters?offset=0&limit=50&market=US")
-                )
-//                XCTAssertEqual(audiobook.chapters?.items.count, 11)
-                XCTAssertEqual(audiobook.chapters?.limit, 50)
-                XCTAssertNil(audiobook.chapters?.next)
-                XCTAssertEqual(audiobook.chapters?.offset, 0)
-                XCTAssertNil(audiobook.chapters?.previous)
-//                XCTAssertEqual(audiobook.chapters?.total, 11)
-            }
-
-            // MARK: Steve Jobs
-            do {
-                let audiobook = audiobooks[3]
-                XCTAssertEqual(audiobook.authors.count, 1)
-                XCTAssertEqual(audiobook.authors.first?.name, "Walter Isaacson")
-                XCTAssertEqual(
-                    audiobook.description,
-                    """
-                    Author(s): Walter Isaacson
-                    Narrator(s): Dylan Baker, Walter Isaacson
-                    
-                    <b>2012 Audie Award Finalist for Audiobook of the Year</b><br><br><b>Walter Isaacson’s “enthralling” (<i>The New Yorker</i>) worldwide bestselling biography of Apple cofounder Steve Jobs.</b><br><br>Based on more than forty interviews with Steve Jobs conducted over two years—as well as interviews with more than 100 family members, friends, adversaries, competitors, and colleagues—Walter Isaacson has written a riveting story of the roller-coaster life and searingly intense personality of a creative entrepreneur whose passion for perfection and ferocious drive revolutionized six industries: personal computers, animated movies, music, phones, tablet computing, and digital publishing.<br> <br>At a time when America is seeking ways to sustain its innovative edge, Jobs stands as the ultimate icon of inventiveness and applied imagination. He knew that the best way to create value in 21st century was to connect creativity with technology. He built a company where leaps of the imagination were combined with remarkable feats of engineering.<br> <br>Although Jobs cooperated with the author, he asked for no control over what was written. He put nothing off-limits. He encouraged the people he knew to speak honestly. And Jobs speaks candidly, sometimes brutally so, about the people he worked with and competed against. His friends, foes, and colleagues provide an unvarnished view of the passions, perfectionism, obsessions, artistry, devilry, and compulsion for control that shaped his approach to business and the innovative products that resulted.<br> <br>Driven by demons, Jobs could drive those around him to fury and despair. But his personality and products were interrelated, just as Apple’s hardware and software tended to be, as if part of an integrated system. His tale is instructive and cautionary, filled with lessons about innovation, character, leadership, and values.<br> <br><i>Steve Jobs </i>is the inspiration for the movie of the same name starring Michael Fassbender, Kate Winslet, Seth Rogen, and Jeff Daniels, directed by Danny Boyle with a screenplay by Aaron Sorkin.
-                    """
-                )
-                XCTAssertEqual(
-                    audiobook.htmlDescription,
-                    """
-                    Author(s): Walter Isaacson<br/>Narrator(s): Dylan Baker, Walter Isaacson<br/>&lt;b&gt;2012 Audie Award Finalist for Audiobook of the Year&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Walter Isaacson’s “enthralling” (&lt;i&gt;The New Yorker&lt;/i&gt;) worldwide bestselling biography of Apple cofounder Steve Jobs.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Based on more than forty interviews with Steve Jobs conducted over two years—as well as interviews with more than 100 family members, friends, adversaries, competitors, and colleagues—Walter Isaacson has written a riveting story of the roller-coaster life and searingly intense personality of a creative entrepreneur whose passion for perfection and ferocious drive revolutionized six industries: personal computers, animated movies, music, phones, tablet computing, and digital publishing.&lt;br&gt; &lt;br&gt;At a time when America is seeking ways to sustain its innovative edge, Jobs stands as the ultimate icon of inventiveness and applied imagination. He knew that the best way to create value in 21st century was to connect creativity with technology. He built a company where leaps of the imagination were combined with remarkable feats of engineering.&lt;br&gt; &lt;br&gt;Although Jobs cooperated with the author, he asked for no control over what was written. He put nothing off-limits. He encouraged the people he knew to speak honestly. And Jobs speaks candidly, sometimes brutally so, about the people he worked with and competed against. His friends, foes, and colleagues provide an unvarnished view of the passions, perfectionism, obsessions, artistry, devilry, and compulsion for control that shaped his approach to business and the innovative products that resulted.&lt;br&gt; &lt;br&gt;Driven by demons, Jobs could drive those around him to fury and despair. But his personality and products were interrelated, just as Apple’s hardware and software tended to be, as if part of an integrated system. His tale is instructive and cautionary, filled with lessons about innovation, character, leadership, and values.&lt;br&gt; &lt;br&gt;&lt;i&gt;Steve Jobs &lt;/i&gt;is the inspiration for the movie of the same name starring Michael Fassbender, Kate Winslet, Seth Rogen, and Jeff Daniels, directed by Danny Boyle with a screenplay by Aaron Sorkin.
-                    """
-                )
-                XCTAssertEqual(audiobook.edition, "Unabridged")
-                XCTAssertEqual(audiobook.isExplicit, false)
-                XCTAssertEqual(audiobook.id, "2rBiFKvU85lq19QYB3Zr38")
-                XCTAssertEqual(audiobook.uri, "spotify:show:2rBiFKvU85lq19QYB3Zr38")
-                XCTAssertNotNil(audiobook.images)
-                XCTAssertEqual(audiobook.languages.first, "en")
-                XCTAssertEqual(audiobook.mediaType, "audio")
-                XCTAssertEqual(audiobook.publisher, "Walter Isaacson")
-                XCTAssertEqual(audiobook.name, "Steve Jobs")
-                XCTAssertEqual(audiobook.narrators.count, 2)
-                XCTAssertEqual(audiobook.narrators.first?.name, "Dylan Baker")
-                XCTAssertEqual(audiobook.totalChapters, 160)
-                XCTAssertEqual(audiobook.type, .audiobook)
-                XCTAssertEqual(
-                    audiobook.chapters?.href.removingLocaleQueryParam,
-                    URL(string: "https://api.spotify.com/v1/audiobooks/2rBiFKvU85lq19QYB3Zr38/chapters?offset=0&limit=50&market=US")
-                )
-                XCTAssertEqual(audiobook.chapters?.items.count, 50)
-                XCTAssertEqual(audiobook.chapters?.limit, 50)
-                XCTAssertNotNil(audiobook.chapters?.next)
-                XCTAssertEqual(audiobook.chapters?.offset, 0)
-                XCTAssertNil(audiobook.chapters?.previous)
-                XCTAssertEqual(audiobook.chapters?.total, 160)
-            }
-
-        }
-
-        let expectation = XCTestExpectation(
-            description: "testAudiobooks"
-        )
-
-        let audiobooks = URIs.Audiobooks.array(
-            .harryPotterAndTheSorcerersStone,
-            .enlightenmentNow,
-            .freeWill,
-            .steveJobs
-        )
-
-        Self.spotify.audiobooks(audiobooks, market: "US")
-            .XCTAssertNoFailure()
-            .receiveOnMain()
-            .sink(
-                receiveCompletion: { _ in expectation.fulfill() },
-                receiveValue: receiveAudiobooks(_:)
-            )
-            .store(in: &Self.cancellables)
-
-        self.wait(for: [expectation], timeout: 120)
-
-    }
-
     func audiobookChapters() {
 
         // spotify:audiobook:2rBiFKvU85lq19QYB3Zr38
@@ -618,7 +426,6 @@ extension SpotifyAPIAudiobookTests {
         XCTAssertEqual(audiodbook.name, "Free Will")
         XCTAssertEqual(audiodbook.narrators.count, 1)
         XCTAssertEqual(audiodbook.narrators.first?.name, "Sam Harris")
-        XCTAssertEqual(audiodbook.publisher, "Sam Harris")
         XCTAssertEqual(audiodbook.type, .audiobook)
         XCTAssertEqual(audiodbook.uri, "spotify:show:4x3Y9YYK84XJSTTJp2atHe")
         XCTAssertImagesExist(audiodbook.images, assertSizeNotNil: true)
@@ -647,126 +454,6 @@ extension SpotifyAPIAudiobookTests {
 
     }
 
-    func chapters() {
-
-        func receiveChapters(_ chapters: [AudiobookChapter?]) {
-
-            encodeDecode(chapters)
-
-            let chapters = chapters.enumerated().compactMap {
-                chapter -> AudiobookChapter? in
-
-                XCTAssertNotNil(
-                    chapter.element,
-                    "chapter at index \(chapter.offset) was nil"
-                )
-
-                return chapter.element
-            }
-
-            guard chapters.count == 3 else {
-                // we already display errors above if one or more elements
-                // was nil
-                return
-            }
-
-            self.receiveFreeWillChapter1(chapters[0])
-
-            // MARK: Steve Jovs Chapter 2
-            do {
-                let chapter = chapters[1]
-                XCTAssertEqual(
-                    chapter.restrictions?["reason"],
-                    "payment_required"
-                )
-                XCTAssertEqual(chapter.id, "7z9aAoKD03hEVfg47PJdzQ")
-                XCTAssertEqual(chapter.chapterNumber, 4)
-                XCTAssertEqual(chapter.durationMS, 1_037_531)
-                XCTAssertEqual(chapter.isExplicit, false)
-                XCTAssertEqual(
-                    chapter.name,
-                    "Chapter 1: Childhood: Abandoned and Chosen 2"
-                )
-                XCTAssertEqual(chapter.releaseDatePrecision, "day")
-                XCTAssertEqual(chapter.isPlayable, false)
-                XCTAssertEqual(chapter.type, .chapter)
-                XCTAssertEqual(chapter.uri, "spotify:episode:7z9aAoKD03hEVfg47PJdzQ")
-                XCTAssertEqual(
-                    chapter.externalURLs?["spotify"],
-                    URL(string: "https://open.spotify.com/episode/7z9aAoKD03hEVfg47PJdzQ")
-                )
-                XCTAssertEqual(
-                    chapter.href.removingLocaleQueryParam,
-                    URL(string: "https://api.spotify.com/v1/chapters/7z9aAoKD03hEVfg47PJdzQ")
-                )
-                XCTAssertEqual(chapter.audiobook?.name, "Steve Jobs")
-                XCTAssertEqual(
-                    chapter.audiobook?.uri,
-                    "spotify:show:2rBiFKvU85lq19QYB3Zr38"
-                )
-            }
-
-            // MARK: Enlightenment Now Chapter 3
-            do {
-                let chapter = chapters[2]
-                XCTAssertEqual(
-                    chapter.restrictions?["reason"],
-                    "payment_required"
-                )
-                XCTAssertEqual(chapter.id, "1cwNPlPUCmwHBR72q6ecge")
-                XCTAssertEqual(chapter.chapterNumber, 5)
-                XCTAssertEqual(chapter.durationMS, 1_195_080)
-                XCTAssertEqual(chapter.isExplicit, false)
-                XCTAssertEqual(chapter.name, "Chapter 3")
-                XCTAssertEqual(chapter.isPlayable, false)
-                XCTAssertEqual(chapter.type, .chapter)
-                XCTAssertEqual(chapter.uri, "spotify:episode:1cwNPlPUCmwHBR72q6ecge")
-                XCTAssertEqual(
-                    chapter.externalURLs?["spotify"],
-                    URL(string: "https://open.spotify.com/episode/1cwNPlPUCmwHBR72q6ecge")
-                )
-                XCTAssertEqual(
-                    chapter.href.removingLocaleQueryParam,
-                    URL(string: "https://api.spotify.com/v1/chapters/1cwNPlPUCmwHBR72q6ecge")
-                )
-                XCTAssertEqual(
-                    chapter.audiobook?.name,
-                    "Enlightenment Now: The Case for Reason, Science, Humanism, and Progress"
-                )
-                XCTAssertEqual(
-                    chapter.audiobook?.uri,
-                    "spotify:show:2fUedmI8FowN4xYJuMIDfi"
-                )
-            }
-
-        }
-
-        let expectation = XCTestExpectation(
-            description: "testChapters"
-        )
-
-        let chapters = URIs.Chapters.array(
-            .freeWillChapter1,
-            .steveJobsChapter2,
-            .enlightenmentNowChapter3
-        )
-
-        Self.spotify.chapters(
-            chapters, market: "US"
-        )
-        .XCTAssertNoFailure()
-        .receiveOnMain()
-        .sink(
-            receiveCompletion: { _ in expectation.fulfill() },
-            receiveValue: receiveChapters(_:)
-        )
-        .store(in: &Self.cancellables)
-
-        self.wait(for: [expectation], timeout: 120)
-
-
-    }
-
 }
 
 final class SpotifyAPIClientCredentialsFlowAudiobookTests:
@@ -775,17 +462,13 @@ final class SpotifyAPIClientCredentialsFlowAudiobookTests:
 
     static let allTests = [
         ("testAudiobook", testAudiobook),
-        ("testAudiobooks", testAudiobooks),
         ("testAudiobookChapters", testAudiobookChapters),
         ("testChapter", testChapter),
-        ("testChapters", testChapters)
     ]
 
     func testAudiobook() { audiobook() }
-    func testAudiobooks() { audiobooks() }
     func testAudiobookChapters() { audiobookChapters() }
     func testChapter() { chapter() }
-    func testChapters() { chapters() }
 
 }
 
@@ -795,17 +478,13 @@ final class SpotifyAPIAuthorizationCodeFlowAudiobookTests:
 
     static let allTests = [
         ("testAudiobook", testAudiobook),
-        ("testAudiobooks", testAudiobooks),
         ("testAudiobookChapters", testAudiobookChapters),
         ("testChapter", testChapter),
-        ("testChapters", testChapters)
     ]
 
     func testAudiobook() { audiobook() }
-    func testAudiobooks() { audiobooks() }
     func testAudiobookChapters() { audiobookChapters() }
     func testChapter() { chapter() }
-    func testChapters() { chapters() }
 
 }
 
@@ -815,16 +494,12 @@ final class SpotifyAPIAuthorizationCodeFlowPKCEAudiobookTests:
 
     static let allTests = [
         ("testAudiobook", testAudiobook),
-        ("testAudiobooks", testAudiobooks),
         ("testAudiobookChapters", testAudiobookChapters),
         ("testChapter", testChapter),
-        ("testChapters", testChapters)
     ]
 
     func testAudiobook() { audiobook() }
-    func testAudiobooks() { audiobooks() }
     func testAudiobookChapters() { audiobookChapters() }
     func testChapter() { chapter() }
-    func testChapters() { chapters() }
 
 }

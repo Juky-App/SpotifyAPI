@@ -114,7 +114,6 @@ final class CodingCurrentlyPlayingContextTests: SpotifyAPITestCase {
         XCTAssertEqual(track.uri, "spotify:track:4m0dj1HxXzFlnIqPkomXQB")
         XCTAssertEqual(track.durationMS, 211961)
         XCTAssertNil(track.isPlayable)
-        XCTAssertEqual(track.popularity, 47)
         
         XCTAssertEqual(track.album?.name, "Oncle Jazz")
         XCTAssertEqual(
@@ -129,7 +128,6 @@ final class CodingCurrentlyPlayingContextTests: SpotifyAPITestCase {
         
         let album = try XCTUnwrap(track.album)
         XCTAssertEqual(album.type, .album)
-        XCTAssertEqual(album.availableMarkets, ["AD", "AE", "ZA"])
         XCTAssertEqual(
             album.externalURLs,
             [

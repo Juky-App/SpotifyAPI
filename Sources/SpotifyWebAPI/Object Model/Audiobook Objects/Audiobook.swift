@@ -12,9 +12,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
     /// The narrators of the audiobook.
     public let narrators: [AudiobookAuthor]
     
-    /// The publisher of the audiobook.
-    public let publisher: String
-    
     /// A description of the audiobook. See also ``htmlDescription``.
     public let description: String
     
@@ -50,17 +47,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
 
     /// Images for the audiobook in various sizes, widest first.
     public let images: [SpotifyImage]?
-    
-    /**
-     A list of the countries in which the audiobook can be played, identified
-     by their [ISO 3166-1 alpha-2][1] codes.
-     
-     If a market parameter was supplied in the request that returned this
-     audiobook, then this property will be `nil`.
-    
-     [1]: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-     */
-    public let availableMarkets: [String]?
     
     /**
      A link to the Spotify web API endpoint providing the full audiobook object.
@@ -106,7 +92,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
        - name: The name of the audiobook.
        - authors: The authors of the audiobook.
        - narrators: The narrators of the audiobook.
-       - publisher: The publisher of the audiobook.
        - description: A description of the audiobook. See also
              ``htmlDescription``.
        - htmlDescription: A description of the audiobook which may contain HTML
@@ -121,8 +106,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
        - uri: The [Spotify URI][1] for the audiobook.
        - id: The [Spotify ID][1] for the audiobook.
        - images: Images for the audiobook in various sizes, widest first.
-       - availableMarkets: A list of the countries in which the audiobook can be
-             played, identified by their [ISO 3166-1 alpha-2][2] codes.
        - href: A link to the Spotify web API endpoint providing the full
              audiobook object. Use ``SpotifyAPI/getFromHref(_:responseType:)``,
              passing in ``Audiobook`` as the response type to retrieve the
@@ -145,7 +128,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
         name: String,
         authors: [AudiobookAuthor],
         narrators: [AudiobookAuthor],
-        publisher: String,
         description: String,
         htmlDescription: String,
         chapters: PagingObject<AudiobookChapter>?,
@@ -154,7 +136,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
         uri: String,
         id: String,
         images: [SpotifyImage]? = nil,
-        availableMarkets: [String]? = nil,
         href: URL,
         externalURLs: [String : URL]? = nil,
         languages: [String],
@@ -165,7 +146,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
         self.name = name
         self.authors = authors
         self.narrators = narrators
-        self.publisher = publisher
         self.description = description
         self.htmlDescription = htmlDescription
         self.chapters = chapters
@@ -174,7 +154,6 @@ public struct Audiobook: Hashable, SpotifyURIConvertible {
         self.uri = uri
         self.id = id
         self.images = images
-        self.availableMarkets = availableMarkets
         self.href = href
         self.externalURLs = externalURLs
         self.languages = languages
@@ -192,7 +171,6 @@ extension Audiobook: Codable {
         case name
         case authors
         case narrators
-        case publisher
         case description
         case htmlDescription = "html_description"
         case chapters
@@ -201,7 +179,6 @@ extension Audiobook: Codable {
         case uri
         case id
         case images
-        case availableMarkets = "available_markets"
         case href
         case externalURLs = "external_urls"
         case languages
@@ -224,9 +201,6 @@ extension Audiobook: Codable {
         )
         self.narrators = try container.decode(
             [AudiobookAuthor].self, forKey: .narrators
-        )
-        self.publisher = try container.decode(
-            String.self, forKey: .publisher
         )
         self.description = try container.decode(
             String.self, forKey: .description
@@ -251,10 +225,6 @@ extension Audiobook: Codable {
         )
         
         self.images = try container.decodeSpotifyImages(forKey: .images)
-
-        self.availableMarkets = try container.decodeAndUnwrapArray(
-            forKey: .availableMarkets
-        )
         
         self.href = try container.decode(
             URL.self, forKey: .href
@@ -295,9 +265,6 @@ extension Audiobook: Codable {
             self.narrators, forKey: .narrators
         )
         try container.encode(
-            self.publisher, forKey: .publisher
-        )
-        try container.encode(
             self.description, forKey: .description
         )
         try container.encode(
@@ -320,9 +287,6 @@ extension Audiobook: Codable {
         )
         try container.encodeIfPresent(
             self.images, forKey: .images
-        )
-        try container.encodeIfPresent(
-            self.availableMarkets, forKey: .availableMarkets
         )
         try container.encode(
             self.href, forKey: .href
@@ -368,7 +332,6 @@ extension Audiobook: ApproximatelyEquatable {
         return self.name == other.name &&
                 self.authors == other.authors &&
                 self.narrators == other.narrators &&
-                self.publisher == other.publisher &&
                 self.description == other.description &&
                 self.htmlDescription == other.htmlDescription &&
                 self.chapters.isApproximatelyEqual(to: other.chapters) &&
@@ -377,7 +340,6 @@ extension Audiobook: ApproximatelyEquatable {
                 self.uri == other.uri &&
                 self.id == other.id &&
                 self.images == other.images &&
-                self.availableMarkets == other.availableMarkets &&
                 self.href == other.href &&
                 self.externalURLs == other.externalURLs &&
                 self.languages == other.languages &&
