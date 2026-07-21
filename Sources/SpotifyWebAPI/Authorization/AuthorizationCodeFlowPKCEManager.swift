@@ -585,15 +585,19 @@ public extension AuthorizationCodeFlowPKCEBackendManager {
                          for an access token only once, after which it becomes
                          invalid. This implies that Spotify should always return
                          a new refresh token in addition to an access token.
+                         
+                         Sometimes though, the refresh token can be missing from
+                         the response. In that case, you can re-use the old
+                         refreshToken. Spotify: "A refresh token that can be used
+                         to request new access tokens. When refreshing an access
+                         token, the response might not include a new refresh token.
+                         If it does not, continue using the existing token"
                          */
-                        if authInfo.accessToken == nil ||
-                                authInfo.refreshToken == nil ||
-                                authInfo.expirationDate == nil {
+                        if authInfo.accessToken == nil || authInfo.expirationDate == nil {
                             
                             let errorMessage = """
                                 missing properties after refreshing access token \
-                                (expected access token, refresh token, \
-                                and expiration date):
+                                (expected access token and expiration date):
                                 \(authInfo)
                                 """
                             Self.logger.error("\(errorMessage)")
